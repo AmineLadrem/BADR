@@ -17,14 +17,27 @@ body {
 
  
 .left-panel {
-    width: 30%;
+    width: 100%;
     margin-right: 2%;
     /* Add a small gap between the panels */
     height: 80vh; /* Set a fixed height for the left panel */
-    overflow-y: auto; /* Enable vertical scrollbar if content overflows */
-    overflow-x: hidden; /* Hide horizontal scrollbar */
     margin: auto; /* Center the left panel horizontally */
 }
+
+.form-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Adjust the gap between form fields */
+}
+
+.flex-container {
+    flex: 1 1 45%; /* Adjust the width of the flex items */
+    display: flex;
+    align-items: center;
+}
+
+ 
+
 
 .right-panel {
     width: 70%;
@@ -104,6 +117,13 @@ button[type="button"] {
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s;
+}
+
+button[name="add-user"] {
+
+    margin-top: 20px;
+    margin-bottom: 20px;
+ 
 }
 
 button[type="button"]:hover {

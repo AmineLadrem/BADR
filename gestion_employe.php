@@ -97,9 +97,9 @@ $result = $conn->query($sql);
 
 <body>
     <div class="navbar">
-        <a href="PFE.html"><img src="badrPFE.png" alt="Accueil"></a>
+        <a href="menu_utilisateurs_nrml.html"><img src="badrPFE.png" alt="Accueil"></a>
         <a href="gestion_employe.php">Gestion des Employés</a>
-        <a href="gestion_demandes_conges.php">Gestion des conges</a>
+        <a href="gestion_conges.php">Gestion des conges</a>
         <a href="gestion_absences_superviseur.php">Gestion des absence</a>
         <a href="gestion_demandes_sorties.php">Gestion demande sortie</a>
         <a href="conges_exceptionnel.php">Gestion des conges exceptionnel</a>
@@ -116,73 +116,104 @@ $result = $conn->query($sql);
 
     </div>
     <div class="container">
-        <div class="left-panel">
-            <h1>Ajouter un utilisateur</h1>
-            <form class="app_form" action="apprecations.php" method="post">
-                <!-- Fields for utilisateur table -->
+        <<div class="left-panel">
+    <h1>Les informations personnelles</h1>
+    <form class="app_form" action="apprecations.php" method="post">
+        <!-- Fields for utilisateur table -->
+        <div class="form-wrapper personal-info">
+            <div class="flex-container">
                 <label for="nom">Nom:</label>
-                <input type="text" id="nom" name="nom" required><br>
+                <input type="text" id="nom" name="nom" required>
+            </div>
+            <div class="flex-container">
                 <label for="prenom">Prénom:</label>
-                <input type="text" id="prenom" name="prenom" required><br>
+                <input type="text" id="prenom" name="prenom" required>
+            </div>
+            <div class="flex-container">
                 <label for="date_naissance">Date de naissance:</label>
-                <input type="date" id="date_naissance" name="date_naissance" required><br>
+                <input type="date" id="date_naissance" name="date_naissance" required>
+            </div>
+            <div class="flex-container">
                 <label for="telephone">Téléphone:</label>
-                <input type="text" id="telephone" name="telephone" required><br>
+                <input type="text" id="telephone" name="telephone" required>
+            </div>
+            <div class="flex-container">
                 <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required><br>
-                <label for="matricule">Matricule:</label>
-                <input type="text" id="matricule" name="matricule" required><br>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="flex-container">
                 <label for="is_supervisor">Superviseur:</label>
-                <input type="number" id="is_supervisor" name="is_supervisor" min="0" max="1" required><br>
+                <input type="number" id="is_supervisor" name="is_supervisor" min="0" max="1" required>
+            </div>
+            <div class="flex-container">
                 <label for="salaire">Salaire:</label>
-                <input type="number" id="salaire" name="salaire" min="0" required><br>
-                <label for="statut">Statut:</label>
-                <input type="text" id="statut" name="statut"><br>
-                <label for="service">Service:</label>
-                <input type="text" id="service" name="service"><br>
-                <label for="poste">Poste:</label>
-                <input type="text" id="poste" name="poste"><br>
-                <label for="est_superieur_hierarchique">Est supérieur hiérarchique:</label>
-                <input type="number" id="est_superieur_hierarchique" name="est_superieur_hierarchique" min="0" max="1"><br>
+                <input type="number" id="salaire" name="salaire" min="0" required>
+            </div>
+        </div>
 
-
+        <!-- Fields for diplome table -->
+        <h1>Diplôme</h1>
+        <div class="form-wrapper diplome-info">
+            <div class="flex-container">
                 <label for="type_diplome">Type de diplôme:</label>
-                <input type="text" id="type_diplome" name="type_diplome" required><br>
+                <input type="text" id="type_diplome" name="type_diplome" required>
+            </div>
+            <div class="flex-container">
                 <label for="domaine">Domaine:</label>
-                <input type="text" id="domaine" name="domaine" required><br>
-                <label for="lieu_obtention">Lieu d'obtention:</label>
+                <input type="text" id="domaine" name="domaine" required>
+            </div>
+            <div class="flex-container">
+            <label for="lieu_obtention">Lieu d'obtention:</label>
                 <input type="text" id="lieu_obtention" name="lieu_obtention" required><br>
-                <label for="date_obtention">Date d'obtention:</label>
+            </div>
+            <div class="flex-container">
+            <label for="date_obtention">Date d'obtention:</label>
                 <input type="date" id="date_obtention" name="date_obtention" required><br>
+            </div>
+        </div>
 
-                <!-- Fields for experiences table -->
-                <label for="date_debut">Date de début:</label>
+        <!-- Fields for experiences table -->
+        <h1>Experience</h1>
+        <div class="form-wrapper experience-info">
+        <div class="flex-container">
+        <label for="date_debut">Date de début:</label>
                 <input type="date" id="date_debut" name="date_debut" required><br>
-                <label for="date_fin">Date de fin:</label>
+            </div>
+            <div class="flex-container">
+            <label for="date_fin">Date de fin:</label>
                 <input type="date" id="date_fin" name="date_fin" required><br>
-                <label for="poste_experience">Poste:</label>
+            </div>
+            <div class="flex-container">
+            <label for="poste_experience">Poste:</label>
                 <input type="text" id="poste_experience" name="poste_experience" required><br>
-                <label for="entreprise">Entreprise:</label>
+            </div>
+            <div class="flex-container">
+            <label for="entreprise">Entreprise:</label>
                 <input type="text" id="entreprise" name="entreprise" required><br>
-                <label for="motif">Motif:</label>
+            </div>
+            <div class="flex-container">
+            <label for="motif">Motif:</label>
                 <select id="motif" name="motif" required>
                     <option value="demission">Démission</option>
                     <option value="retraite">Retraite</option>
                     <option value="Fin de contrat">Fin de contrat</option>
                 </select><br>
-
-                <!-- Buttons -->
-                <button name="add-user" type="submit"><i class="fas fa-plus"></i> Ajouter Utilisateur</button>
-               <!--   <button type="button" onclick="window.print()"><i class="fas fa-print"></i></button>-->
-                <?php if (isset($error)) : ?>
-                    <p class="error"><?php echo $error; ?></p>
-                <?php endif; ?>
-                <?php if (isset($success)) : ?>
-                    <p class="success"><?php echo $success; ?></p>
-                <?php endif; ?>
-            </form>
-
+            </div>
+            <button name="add-user" type="submit"><i class="fas fa-plus"></i> Ajouter Utilisateur</button>
         </div>
+
+        <!-- Buttons -->
+        
+        <!--   <button type="button" onclick="window.print()"><i class="fas fa-print"></i></button>-->
+        <?php if (isset($error)) : ?>
+            <p class="error"><?php echo $error; ?></p>
+        <?php endif; ?>
+        <?php if (isset($success)) : ?>
+            <p class="success"><?php echo $success; ?></p>
+        <?php endif; ?>
+    </form>
+</div>
+
         <div class="right-panel">
     <h1>Liste des utilisateurs</h1>
 

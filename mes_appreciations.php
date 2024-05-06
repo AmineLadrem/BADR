@@ -4,15 +4,17 @@ include 'db.php'; // Assurez-vous que ce fichier inclut votre connexion à la ba
 
 // Vérifie si l'utilisateur est connecté
 if (!isset($_SESSION['email'])) {
-    header("Location: login.php"); // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
+    header("Location: index.php"); // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
     exit;
 }
 
 $email_utilisateur = $_SESSION['email'];
+$matricule = $_SESSION['matricule'];
+$nom = $_SESSION['nom'];
 
 // Récupérer les appréciations de l'utilisateur
-$stmt = $conn->prepare("SELECT * FROM appreciations WHERE email_utilisateur = ?");
-$stmt->bind_param("s", $email_utilisateur);
+$stmt = $conn->prepare("SELECT * FROM appreciations WHERE matricule = ?");
+$stmt->bind_param("s", $matricule);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -27,39 +29,26 @@ while ($row = $result->fetch_assoc()) {
 <head>
     <meta charset="UTF-8">
     <title>Mes Appréciations</title>
-    <style>
-        /* Ajoutez votre CSS personnalisé ici */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
+    <link rel="stylesheet" href="navbar.css">
+    <link rel="stylesheet" href="styles/mes_app.css">.
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+ 
 </head>
 <body>
+<div class="navbar">
+        <a class="logo" href="menu_utilisateurs_nrml.html"><img src="badrPFE.png" alt="Accueil"></a>
+        <a href="gestion_conges.php">Gestion des congés</a>
+        <a href="gestion_absences.php">Gestion des absences</a>
+        <a href="gestion_sorties.php">Gestion des sorties</a>
+        <a href="mes_appreciations.php">Mes appréciations</a>
+        <div class="user-info">
+            <span id="userWelcome"></span>
+            <button class="logout-button" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+    </div>
     <div class="container">
         <h1>Mes Appréciations</h1>
-        <p>Bienvenue, <?php echo $email_utilisateur; ?></p>
+        <p>Bienvenue, <?php echo $nom; ?></p>
         <table>
             <thead>
                 <tr>
@@ -83,5 +72,7 @@ while ($row = $result->fetch_assoc()) {
             </tbody>
         </table>
     </div>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="get_name.js"></script>
 </body>
 </html>

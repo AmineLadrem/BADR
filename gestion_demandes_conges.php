@@ -3,7 +3,7 @@ session_start();
 include 'db.php';
 
 if (!isset($_SESSION['email']) || $_SESSION['is_supervisor'] != 1) {
-    header('Location: login.php');
+    header('Location: index.php');
     exit;
 }
 

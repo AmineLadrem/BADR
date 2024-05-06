@@ -1,0 +1,91 @@
+body {
+    font-family: Consolas, monospace;
+    margin: 0;
+    padding: 0;
+    
+}
+
+.container {
+    padding: 130px;
+}
+
+ 
+
+/* Form Styling */
+form {
+    margin-bottom: 20px;
+}
+
+form label {
+    display: block; /* Display labels as block elements */
+    margin-bottom: 5px; /* Add some space between labels and inputs */
+}
+
+form input[type="date"],
+form textarea {
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 20%;
+    box-sizing: border-box;
+}
+
+form button[type="submit"] {
+    padding: 10px 20px;
+    background-color: #148d04;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+form button[type="submit"]:hover {
+    background-color: #0e6b03;
+}
+
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table th,
+table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+}
+
+table th {
+    background-color: #148d04;
+    color: white;
+}
+
+table tr {
+    transition: background-color 0.3s;
+}
+
+table tr:hover {
+    background-color: #f2f2f2;
+}
+
+ 
+
+/* Error Message Styling */
+.error {
+    color: #f00;
+    margin-bottom: 10px;
+}
+
+
+.edit-icon {
+    color: orange;
+}
+
+.delete-icon {
+    color: red;
+}

@@ -3,7 +3,7 @@ session_start();
 include 'db.php'; // Assurez-vous que ce fichier inclut votre connexion à la base de données
 
 if (!isset($_SESSION['email'])) {
-    header('Location: login.php'); // Rediriger vers la page de connexion si aucun utilisateur n'est connecté
+    header('Location: index.php'); // Rediriger vers la page de connexion si aucun utilisateur n'est connecté
     exit;
 }
 
@@ -52,57 +52,10 @@ $result = $query->get_result();
 <head>
     <meta charset="UTF-8">
     <title>Gestion des Absences</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            padding: 20px;
-        }
-        form {
-            background: white;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .past {
-            text-decoration: line-through;
-            color: #999;
-        }
-        input, textarea, button {
-            width: 100%;
-            padding: 8px;
-            margin-top: 6px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
-        button {
-            background-color: #0056b3;
-            color: white;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #003d82;
-        }
-        .error {
-            color: red;
-            font-size: 16px;
-            text-align: center;
-        }
-    </style>
+    <link rel="stylesheet" href="navbar.css">
+    <link rel="stylesheet" href="styles/gestion_absences.css">.
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+      
     <script>
         window.onload = function() {
             var rows = document.querySelectorAll('table tr[data-start-date]');
@@ -118,18 +71,37 @@ $result = $query->get_result();
     </script>
 </head>
 <body>
+<div class="navbar">
+        <a class="logo" href="menu_utilisateurs_nrml.html"><img src="badrPFE.png" alt="Accueil"></a>
+        <a href="gestion_conges.php">Gestion des congés</a>
+        <a href="gestion_absences.php">Gestion des absences</a>
+        <a href="gestion_sorties.php">Gestion des sorties</a>
+        <a href="mes_appreciations.php">Mes appréciations</a>
+        <div class="user-info">
+            <span id="userWelcome"></span>
+            <button class="logout-button" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+    </div>
+    <div class="container">
     <h1>Gestion des Absences</h1>
     <?php if (isset($error)): ?>
     <p class="error"><?= $error ?></p>
     <?php endif; ?>
     <form method="post" action="">
-        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-        Date de début: <input type="date" name="dateDebut" min="<?= $dateToday ?>" required>
-        Date de fin: <input type="date" name="dateFin" min="<?= $dateToday ?>" required>
-        Justificatif (facultatif): <textarea name="justificatif"></textarea>
-        <button type="submit">Envoyer demande d'absence</button>
-    </form>
-
+    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+    
+    <label for="dateDebut">Date de début</label>
+    <input type="date" name="dateDebut" id="dateDebut" min="<?= $dateToday ?>" required>
+    
+    <label for="dateFin">Date de fin</label>
+    <input type="date" name="dateFin" id="dateFin" min="<?= $dateToday ?>" required>
+    
+    <label for="justificatif">Justificatif (facultatif)</label>
+    <textarea name="justificatif" id="justificatif"></textarea>
+    <br>
+    
+    <button type="submit">Envoyer demande d'absence</button>
+</form>
     <h2>Vos absences</h2>
     <table>
         <thead>
@@ -149,13 +121,16 @@ $result = $query->get_result();
                 <td><?= htmlspecialchars($row['motif']) ?></td>
                 <td><?= htmlspecialchars($row['statut']) ?></td>
                 <td>
-                <a href="modifier_absence.php?id=<?= $row['id'] ?>">Modifier</a> | 
-                <a href="supprimer_absence.php?id=<?= $row['id'] ?>" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette absence?');">Supprimer</a>
+                <a href="modifier_absence.php?id=<?= $row['id'] ?>"><i class="fas fa-edit edit-icon"></i></a> | 
+                <a href="supprimer_absence.php?id=<?= $row['id'] ?>" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette absence?');"><i class="fas fa-trash-alt delete-icon"></i></a>
             </td>
             </tr>
             <?php endwhile; ?>
         </tbody>
     </table>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="get_name.js"></script>
+    </div>
 </body>
 </html>
 <?php

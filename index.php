@@ -5,7 +5,7 @@ include 'db.php';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];
 
-    $stmt = $conn->prepare("SELECT email, is_supervisor, est_superieur_hierarchique, nom FROM utilisateurs WHERE email = ?");
+    $stmt = $conn->prepare("SELECT email, is_supervisor, est_superieur_hierarchique, nom , matricule FROM utilisateurs WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -22,11 +22,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($result2->num_rows > 0) {
         
             $_SESSION['email'] = $user['email'];
+            $_SESSION['matricule'] = $user['matricule'];
+            $_SESSION['nom'] = $user['nom'];
+            $_SESSION['prenom'] = $user['prenom'];
             $_SESSION['is_supervisor'] = $user['is_supervisor'];
             $_SESSION['est_superieur_hierarchique'] = $user['est_superieur_hierarchique'];
 
      
             setcookie("nom", $user['nom'], time() + (86400 * 30), "/"); 
+            setcookie("matricule", $user['matricule'], time() + (86400 * 30), "/"); 
 
             if ($user['est_superieur_hierarchique'] == 1) {
                 header("Location: menu_PDG.html");
@@ -146,6 +150,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </form>
         <?php if (isset($error)) echo "<p class='error'>$error</p>"; ?>
     </div>
+
+    
 </body>
 
 </html>

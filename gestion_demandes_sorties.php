@@ -4,7 +4,7 @@ include 'db.php'; // Connexion à la base de données
 
 // Vérifiez si l'utilisateur est autorisé (par exemple, un superviseur)
 if (!isset($_SESSION['email']) || $_SESSION['is_supervisor'] != 1) {
-    header('Location: login.php'); // Redirection si non autorisé
+    header('Location: index.php'); // Redirection si non autorisé
     exit;
 }
 
