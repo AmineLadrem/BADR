@@ -1,0 +1,207 @@
+body {
+    font-family: Consolas, monospace;
+    margin: 0;
+    padding: 0;
+    
+}
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+}
+
+ 
+.left-panel {
+    width: 30%;
+    margin-right: 2%;
+    /* Add a small gap between the panels */
+    height: 80vh; /* Set a fixed height for the left panel */
+    overflow-y: auto; /* Enable vertical scrollbar if content overflows */
+    overflow-x: hidden; /* Hide horizontal scrollbar */
+    margin: auto; /* Center the left panel horizontally */
+}
+
+.right-panel {
+    width: 70%;
+    margin-left: 2%;
+    display: none;
+    /* Add a small gap between the panels */
+    margin: auto; /* Center the right panel horizontally */
+}
+
+
+.button-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.button-container > button {
+    color: #fff;
+    background-color: #4CAF50;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.app_form {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="number"] {
+    width: 90px;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button[type="submit"] {
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+
+button[type="submit"] i {
+    margin-right: 5px;
+}
+
+
+
+button[type="button"] {
+    margin-left: 210px;
+    margin-top: 10px;
+    background-color: #1E27B2;
+    width: 50px;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+button[type="button"]:hover {
+    background-color: #131970;
+}
+
+button[name="add-app"]:hover {
+    background-color: #0F6403;
+}
+
+.error {
+    color: #ff0000;
+    margin-top: 10px;
+}
+
+.success {
+    color: #148d04;
+    margin-top: 10px;
+}
+
+/* Style pour le formulaire de filtrage */
+.filter-form {
+    width: 500px;
+    margin-bottom: 20px;
+    margin-left: 30px;
+    display: flex;
+    
+}
+
+/* Style pour le champ de saisie */
+.filter-input {
+    width: 50px;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-right: 10px;
+}
+
+/* Style pour le bouton de soumission */
+.filter-button {
+    height: 40px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    background-color: #148d04;
+    color: white;
+    cursor: pointer;
+    margin-right: 7px;
+}
+
+.filter-button:hover{ 
+
+background-color: #0F6403;
+  }
+
+/* Style pour le bouton de réinitialisation */
+.reset-button {
+    background-color: #aaa;
+    height: 40px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ccc;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s, border-radius 0.3s;
+}
+
+.reset-button:hover {
+    background-color: gray;
+}
+
+table {
+    width: calc(100% - 60px);
+    /* 100% width minus 30px left and 30px right margins */
+    margin-left: 30px;
+    margin-right: 30px;
+    border-collapse: separate;
+    /* Separate border model for curved borders */
+    border-spacing: 0;
+    /* No spacing between table cells */
+    border: 1px solid #ddd;
+    /* Light border color */
+    border-radius: 10px;
+    /* Curved border radius */
+}
+
+th,
+td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+h1 {
+    text-align: center;
+}

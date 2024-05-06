@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Page Principale</title>
+    <!-- Include Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+
+        body {
+            font-family: Consolas, monospace;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        p {
+            color: #666;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="PFE.html"><img src="badrPFE.png" alt="Accueil"></a>
+        <a href="gestion_employe.php">Gestion des Employés</a>
+        <a href="gestion_demandes_conges.php">Gestion des conges</a>
+        <a href="gestion_absences_superviseur.php">Gestion des absence</a>
+        <a href="gestion_demandes_sorties.php">Gestion demande sortie</a>
+        <a href="conges_exceptionnel.php">Gestion des conges exceptionnel</a>
+        <div class="user-info">
+            <span id="userWelcome"></span>
+            <button class="logout-button" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+    </div>
+
+    <h1>Bienvenue sur la page d'accueil de la BADR</h1>
+    <p>Ce menu vous permet de naviguer à travers différentes pages.</p>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="get_name.js"></script>
+
+</body>
+</html>

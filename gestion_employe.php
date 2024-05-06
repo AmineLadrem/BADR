@@ -1,0 +1,266 @@
+<?php
+session_start();
+header('Cache-Control: no-cache, no-store, must-revalidate'); // HTTP 1.1.
+header('Pragma: no-cache'); // HTTP 1.0.
+header('Expires: 0'); // Proxies.
+
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "gestion_utilisateurs";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['token']) && $_POST['token'] === $_SESSION['form_token']) {
+    $nom = $_POST['nom'];
+    $prenom = $_POST['prenom'];
+    $date_naissance = $_POST['date_naissance'];
+    $telephone = $_POST['telephone'];
+    $email = $_POST['email'];
+    $matricule = $_POST['matricule'];
+    $joursCongesRestants = $_POST['joursCongesRestants'];
+    $is_supervisor = $_POST['is_supervisor'];
+    $salaire = $_POST['salaire'];
+    $statut = $_POST['statut'];
+    $service = $_POST['service'];
+    $poste = $_POST['poste'];
+    $est_superieur_hierarchique = $_POST['est_superieur_hierarchique'];
+    $type_diplome = $_POST['type_diplome'];
+    $domaine = $_POST['domaine'];
+    $lieu_obtention = $_POST['lieu_obtention'];
+    $date_obtention = $_POST['date_obtention'];
+    $date_debut_exp = $_POST['date_debut'];
+    $date_fin_exp = $_POST['date_fin'];
+    $poste_experience = $_POST['poste_experience'];
+    $entreprise = $_POST['entreprise'];
+    $motif = $_POST['motif'];
+
+    // Insert into utilisateurs table
+    $sql = "INSERT INTO utilisateurs (nom, prenom, date_naissance, telephone, email, matricule, joursCongesRestants, is_supervisor, salaire, statut, service, poste, est_superieur_hierarchique) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ssssssiiissss", $nom, $prenom, $date_naissance, $telephone, $email, $matricule, $joursCongesRestants, $is_supervisor, $salaire, $statut, $service, $poste, $est_superieur_hierarchique);
+    $stmt->execute();
+
+    if ($stmt->error) {
+        echo "Erreur lors de l'ajout de l'utilisateur: " . $stmt->error;
+        exit; // Stop execution if there's an error
+    }
+
+    // Insert into diplome table
+    $sql = "INSERT INTO diplome (matricule, type_diplome, domaine, lieu_obtention, date_obtention) VALUES ((SELECT matricule FROM utilisateurs WHERE email = ?), ?, ?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sssss", $email, $type_diplome, $domaine, $lieu_obtention, $date_obtention);
+    $stmt->execute();
+
+    if ($stmt->error) {
+        echo "Erreur lors de l'ajout du diplôme: " . $stmt->error;
+        exit; // Stop execution if there's an error
+    }
+
+    // Insert into experiences table
+    $sql = "INSERT INTO experiences (matricule, date_debut, date_fin, poste, entreprise, motif) VALUES ((SELECT matricule FROM utilisateurs WHERE email = ?), ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ssssss", $email, $date_debut_exp, $date_fin_exp, $poste_experience, $entreprise, $motif);
+    $stmt->execute();
+
+    if ($stmt->error) {
+        echo "Erreur lors de l'ajout de l'expérience: " . $stmt->error;
+        exit; // Stop execution if there's an error
+    }
+
+    // Redirect to index3.php if everything is successful
+    header("Location: index3.php");
+    exit;
+}
+
+$sql = "SELECT id, nom, prenom, date_naissance, telephone, email, salaire, statut, service, poste FROM utilisateurs";
+$result = $conn->query($sql);
+?>
+
+
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion des Utilisateurs</title>
+    <link rel="stylesheet" href="style2.css">
+    <link rel="stylesheet" href="navbar.css">
+    <link rel="stylesheet" href="styles/gestion_employe.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+
+</head>
+
+<body>
+    <div class="navbar">
+        <a href="PFE.html"><img src="badrPFE.png" alt="Accueil"></a>
+        <a href="gestion_employe.php">Gestion des Employés</a>
+        <a href="gestion_demandes_conges.php">Gestion des conges</a>
+        <a href="gestion_absences_superviseur.php">Gestion des absence</a>
+        <a href="gestion_demandes_sorties.php">Gestion demande sortie</a>
+        <a href="conges_exceptionnel.php">Gestion des conges exceptionnel</a>
+        <div class="user-info">
+            <span id="userWelcome"></span>
+            <button class="logout-button" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+    </div>
+    <h1>Gestion des Utilisateurs</h1>
+    <div class="button-container">
+
+    <button onclick="showAddUserPanel()">Ajouter un utilisateur</button>
+    <button onclick="showUserListPanel()">Liste des utilisateurs</button>
+
+    </div>
+    <div class="container">
+        <div class="left-panel">
+            <h1>Ajouter un utilisateur</h1>
+            <form class="app_form" action="apprecations.php" method="post">
+                <!-- Fields for utilisateur table -->
+                <label for="nom">Nom:</label>
+                <input type="text" id="nom" name="nom" required><br>
+                <label for="prenom">Prénom:</label>
+                <input type="text" id="prenom" name="prenom" required><br>
+                <label for="date_naissance">Date de naissance:</label>
+                <input type="date" id="date_naissance" name="date_naissance" required><br>
+                <label for="telephone">Téléphone:</label>
+                <input type="text" id="telephone" name="telephone" required><br>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required><br>
+                <label for="matricule">Matricule:</label>
+                <input type="text" id="matricule" name="matricule" required><br>
+                <label for="is_supervisor">Superviseur:</label>
+                <input type="number" id="is_supervisor" name="is_supervisor" min="0" max="1" required><br>
+                <label for="salaire">Salaire:</label>
+                <input type="number" id="salaire" name="salaire" min="0" required><br>
+                <label for="statut">Statut:</label>
+                <input type="text" id="statut" name="statut"><br>
+                <label for="service">Service:</label>
+                <input type="text" id="service" name="service"><br>
+                <label for="poste">Poste:</label>
+                <input type="text" id="poste" name="poste"><br>
+                <label for="est_superieur_hierarchique">Est supérieur hiérarchique:</label>
+                <input type="number" id="est_superieur_hierarchique" name="est_superieur_hierarchique" min="0" max="1"><br>
+
+
+                <label for="type_diplome">Type de diplôme:</label>
+                <input type="text" id="type_diplome" name="type_diplome" required><br>
+                <label for="domaine">Domaine:</label>
+                <input type="text" id="domaine" name="domaine" required><br>
+                <label for="lieu_obtention">Lieu d'obtention:</label>
+                <input type="text" id="lieu_obtention" name="lieu_obtention" required><br>
+                <label for="date_obtention">Date d'obtention:</label>
+                <input type="date" id="date_obtention" name="date_obtention" required><br>
+
+                <!-- Fields for experiences table -->
+                <label for="date_debut">Date de début:</label>
+                <input type="date" id="date_debut" name="date_debut" required><br>
+                <label for="date_fin">Date de fin:</label>
+                <input type="date" id="date_fin" name="date_fin" required><br>
+                <label for="poste_experience">Poste:</label>
+                <input type="text" id="poste_experience" name="poste_experience" required><br>
+                <label for="entreprise">Entreprise:</label>
+                <input type="text" id="entreprise" name="entreprise" required><br>
+                <label for="motif">Motif:</label>
+                <select id="motif" name="motif" required>
+                    <option value="demission">Démission</option>
+                    <option value="retraite">Retraite</option>
+                    <option value="Fin de contrat">Fin de contrat</option>
+                </select><br>
+
+                <!-- Buttons -->
+                <button name="add-user" type="submit"><i class="fas fa-plus"></i> Ajouter Utilisateur</button>
+               <!--   <button type="button" onclick="window.print()"><i class="fas fa-print"></i></button>-->
+                <?php if (isset($error)) : ?>
+                    <p class="error"><?php echo $error; ?></p>
+                <?php endif; ?>
+                <?php if (isset($success)) : ?>
+                    <p class="success"><?php echo $success; ?></p>
+                <?php endif; ?>
+            </form>
+
+        </div>
+        <div class="right-panel">
+    <h1>Liste des utilisateurs</h1>
+
+    <!-- Formulaire de filtrage -->
+    <form class="filter-form" action="" method="GET">
+        <input class="filter-input" type="text" name="matricule" placeholder="Matricule...">
+        <button class="filter-button" type="submit">Filtrer</button>
+        <button name="reset-button" class="reset-button" type="submit">Réinitialiser</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Matricule</th>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Date de naissance</th>
+                <th>Téléphone</th>
+                <th>Email</th>
+                <th>Salaire</th>
+                <th>Statut</th>
+                <th>Service</th>
+                <th>Poste</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            // Récupérer les valeurs filtrées si elles existent
+            $filter_matricule = isset($_GET['matricule']) ? $_GET['matricule'] : '';
+
+            // Construction de la requête SQL en fonction du filtrage par matricule
+            $sql = "SELECT matricule, nom, prenom, date_naissance, telephone, email, salaire, statut, service, poste, est_superieur_hierarchique FROM utilisateurs";
+            if (!empty($filter_matricule)) {
+                $sql .= " WHERE matricule LIKE '%$filter_matricule%'";
+            }
+
+            // Exécution de la requête SQL
+            $result = $conn->query($sql);
+
+            // Affichage des résultats
+            while ($row = $result->fetch_assoc()) : ?>
+                <tr>
+                    <td><?= $row["matricule"] ?></td>
+                    <td><?= $row["nom"] ?></td>
+                    <td><?= $row["prenom"] ?></td>
+                    <td><?= $row["date_naissance"] ?></td>
+                    <td><?= $row["telephone"] ?></td>
+                    <td><?= $row["email"] ?></td>
+                    <td><?= $row["salaire"] ?></td>
+                    <td><?= $row["statut"] ?></td>
+                    <td><?= $row["service"] ?></td>
+                    <td><?= $row["poste"] ?></td>
+                    <td> <a><i class="fas fa-edit"></i></a>    <a><i class="fas fa-trash-alt"></i></a> </td>
+                      
+                </tr>
+            <?php endwhile; ?>
+
+        </tbody>
+    </table>
+</div>
+
+    </div>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="get_name.js"></script>
+  
+    <script>
+        function showAddUserPanel() {
+            document.querySelector('.left-panel').style.display = 'block';
+            document.querySelector('.right-panel').style.display = 'none';
+        }
+
+        function showUserListPanel() {
+            document.querySelector('.left-panel').style.display = 'none';
+            document.querySelector('.right-panel').style.display = 'block';
+        }
+    </script>
+</body>
+
+</html>

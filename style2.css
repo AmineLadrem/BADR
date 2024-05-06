@@ -1,0 +1,67 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2 {
+    text-align: center;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+form input[type="text"],
+form input[type="date"],
+form input[type="email"],
+form select {
+    width: 150px;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+
+form button {
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+td a {
+    text-decoration: none;
+    color: #4CAF50;
+}
+
+a.modify {
+    color: #ffc107;
+}
+
+a.delete {
+    color: #f44336;
+}
+
+a.plus {
+    color: #2196F3;
+}

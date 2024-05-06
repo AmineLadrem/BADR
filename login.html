@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion Utilisateur</title>
+</head>
+<body>
+    <h1>Connexion Utilisateur</h1>
+    <form action="verify_user.php" method="post">
+        Entrez votre email : <input type="email" name="email" required>
+        <button type="submit">Connexion</button>
+    </form>
+    <?php
+        if (isset($_GET['error']) && $_GET['error'] == 'invalidemail') {
+            echo '<p style="color:red;">Email non reconnu. Veuillez réessayer.</p>';
+        }
+    ?>
+</body>
+</html>

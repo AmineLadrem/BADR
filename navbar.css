@@ -1,0 +1,63 @@
+.navbar {
+    overflow: hidden;
+    background-color: #148d04;
+    display: flex;
+    align-items: center;
+    color: white;
+    font-family: Consolas, monospace;
+    margin: 10px;
+    border-radius: 15px;
+    padding: 5px;
+}
+
+/* Les liens de la barre de navigation */
+.navbar a {
+    display: block;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    color: inherit; /* Utilise la couleur de texte par défaut pour les liens */
+    font-size: 16px;
+    transition: background-color 0.3s, color 0.3s, border-radius 0.3s; /* Ajout de la transition pour le survol */
+    border-radius: 10px; /* Bordure courbée par défaut */
+}
+
+/* Changement de couleur des liens au survol */
+.navbar a:hover {
+    background-color: #fff;
+    color: #148d04;
+    border-radius: 10px; /* Bordure courbée au survol */
+}
+
+/* Style pour l'image dans le lien */
+.navbar a img {
+    height: 20px; /* ou la taille que vous souhaitez */
+    vertical-align: middle; /* pour aligner l'image verticalement avec le texte s'il y en a */
+    margin-right: 5px; /* espace entre l'image et le texte */
+}
+
+.user-info {
+    margin-left: auto; /* met le nom de l'utilisateur à droite */
+    padding: 14px 16px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.logout-button {
+    margin-left: 10px;
+    padding: 8px 12px;
+    background-color: #ddd;
+    border: none;
+    color: #333;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s, border-radius 0.3s; /* Ajout de la transition pour le survol */
+    border-radius: 10px; /* Bordure courbée par défaut */
+}
+
+.logout-button:hover {
+    background-color: #aaa;
+    color: white;
+    border-radius: 10px; /* Bordure courbée au survol */
+}
