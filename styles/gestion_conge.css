@@ -9,6 +9,10 @@ body {
     padding: 20px;
 }
 
+h2[name="remaining_days"]{
+    color: red;
+}
+
  
 
 /* Form Styling */
@@ -92,4 +96,46 @@ table tr.past {
 
 .delete-icon {
     color: red;
+}
+.deleteButton:hover{
+    cursor:pointer;
+}
+
+label[name="upload"] {
+    background-color: #148d04;
+    color: white;
+    padding: 0.5rem;
+    font-family: sans-serif;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    width:195px;
+    margin-top: 1rem;
+  }
+  
+/* Checkbox Styling */
+input[type="checkbox"] {
+    appearance: none; /* Remove default appearance */
+    -webkit-appearance: none; /* Remove default appearance for Safari */
+    -moz-appearance: none; /* Remove default appearance for Firefox */
+    width: 20px; /* Set custom width */
+    height: 20px; /* Set custom height */
+    border: 2px solid #ccc; /* Add border */
+    border-radius: 3px; /* Add border radius */
+    cursor: pointer; /* Add pointer cursor */
+    outline: none; /* Remove default focus outline */
+    transition: background-color 0.3s, border-color 0.3s; /* Add transition effect */
+}
+
+input[type="checkbox"]:checked {
+    background-color: #148d04; /* Change background color when checked */
+    border-color: #148d04; /* Change border color when checked */
+}
+
+/* Custom checkbox tick */
+input[type="checkbox"]:checked::before {
+    content: "\2713"; /* Unicode character for checkmark */
+    display: block;
+    color: white; /* Set checkmark color */
+    text-align: center; /* Center the checkmark */
+    line-height: 20px; /* Match the height of the checkbox */
 }

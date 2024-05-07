@@ -3,54 +3,29 @@ session_start();
 include 'db.php';
 
 if (!isset($_SESSION['email'])) {
-    header('Location: login.php');
-    exit;
-}
-
-if (!isset($_GET['id']) || empty($_GET['id'])) {
-    header('Location: erreur.php');
-    exit;
-}
-
-$id_conge = $_GET['id'];
-
-$query = $conn->prepare("SELECT * FROM demandesConges WHERE id = ?");
-$query->bind_param("i", $id_conge);
-$query->execute();
-$result = $query->get_result();
-
-if ($result->num_rows === 0) {
-    header('Location: erreur.php');
+    http_response_code(401); // Unauthorized
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!isset($_POST['id']) || empty($_POST['id'])) {
+        http_response_code(400); // Bad Request
+        exit;
+    }
+
+    $id_conge = $_POST['id'];
+
     $deleteQuery = $conn->prepare("DELETE FROM demandesConges WHERE id = ?");
     $deleteQuery->bind_param("i", $id_conge);
-    $deleteQuery->execute();
-
-    header("Location: gestion_conges.php");
+    if ($deleteQuery->execute()) {
+        http_response_code(200); // OK
+        exit;
+    } else {
+        http_response_code(500); // Internal Server Error
+        exit;
+    }
+} else {
+    http_response_code(405); // Method Not Allowed
     exit;
 }
-
-?>
-
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Supprimer une demande de congé</title>
-    <!-- Styles CSS -->
-</head>
-<body>
-    <h1>Supprimer une demande de congé</h1>
-    <p>Êtes-vous sûr de vouloir supprimer cette demande de congé ?</p>
-    <form method="post" action="">
-        <button type="submit">Confirmer la suppression</button>
-    </form>
-</body>
-</html>
-
-<?php
-$conn->close();
 ?>

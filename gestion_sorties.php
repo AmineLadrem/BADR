@@ -123,7 +123,7 @@ $result = $query->get_result();
                 <td><?= htmlspecialchars($row['statut']) ?></td>
                 <td>
                 <a href="modifier_absence.php?id=<?= $row['id'] ?>"><i class="fas fa-edit edit-icon"></i></a> | 
-                <a href="supprimer_absence.php?id=<?= $row['id'] ?>" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette absence?');"><i class="fas fa-trash-alt delete-icon"></i></a>
+                <a href="supprimer_sortie.php?id=<?= $row['id'] ?>" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette sortie?');"><i class="fas fa-trash-alt delete-icon"></i></a>
             </td>
             </tr>
             <?php endwhile; ?>

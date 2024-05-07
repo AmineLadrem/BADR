@@ -97,12 +97,11 @@ $result = $conn->query($sql);
 
 <body>
     <div class="navbar">
-        <a href="menu_utilisateurs_nrml.html"><img src="badrPFE.png" alt="Accueil"></a>
-        <a href="gestion_employe.php">Gestion des Employés</a>
-        <a href="gestion_conges.php">Gestion des conges</a>
-        <a href="gestion_absences_superviseur.php">Gestion des absence</a>
-        <a href="gestion_demandes_sorties.php">Gestion demande sortie</a>
-        <a href="conges_exceptionnel.php">Gestion des conges exceptionnel</a>
+    <a class="logo" href="RH.html"><img src="badrPFE.png" alt="Accueil"></a>
+        <a href="gestion_employe.php">Gestion des employés</a>
+        <a href="gestion_demandes_conges.php">Gestion des congés</a>
+        <a href="gestion_absences_superviseur.php">Gestion des absences</a>
+        <a href="gestion_demandes_sorties.php">Gestion des sorties</a>
         <div class="user-info">
             <span id="userWelcome"></span>
             <button class="logout-button" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>

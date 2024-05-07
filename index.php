@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 header("Location: menu_PDG.html");
                 exit;
             } elseif ($user['is_supervisor'] == 1) {
-                header("Location: PFE.html");
+                header("Location: RH.html");
                 exit;
             } else {
                 header("Location: menu_utilisateurs_nrml.html");

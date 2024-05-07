@@ -1,5 +1,11 @@
 <?php
 session_start();
+
+// Generate a CSRF token and store it in the session
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 include 'db.php'; // Assurez-vous que ce fichier inclut votre connexion à la base de données
  
 
@@ -70,7 +76,7 @@ $result = $query->get_result();
     <meta charset="UTF-8">
     <title>Gestion des Congés</title>
     <link rel="stylesheet" href="navbar.css">
-    <link rel="stylesheet" href="styles/gestion_conges.css">.
+    <link rel="stylesheet" href="styles/gestion_conge.css">.
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
       
     <script>
@@ -91,7 +97,7 @@ $result = $query->get_result();
 <div class="navbar">
         <a class="logo" href="menu_utilisateurs_nrml.html"><img src="badrPFE.png" alt="Accueil"></a>
         <a href="gestion_conges.php">Gestion des congés</a>
-        <a href="gestion_absences.php">Gestion des absences</a>
+        <a href="gestion_absences.php">Gestion des absences</a> 
         <a href="gestion_sorties.php">Gestion des sorties</a>
         <a href="mes_appreciations.php">Mes appréciations</a>
         <div class="user-info">
@@ -101,7 +107,7 @@ $result = $query->get_result();
     </div>
     <div class="container">
     <h1>Gestion des Congés</h1>
-    <h2>Vous avez <?= $joursRestants ?> jours de congés restants.</h2>
+    <h2 name="remaining_days">Vous avez <?= $joursRestants ?> jours de congés restants.</h2>
     <?php if (isset($error)): ?>
     <p class="error"><?= $error ?></p>
     <?php endif; ?>
@@ -116,10 +122,39 @@ $result = $query->get_result();
     
     <label for="justificatif">Justificatif (facultatif)</label>
     <textarea name="justificatif" id="justificatif"></textarea>
-    <br>
     
+    <br>
+
+    <label for="congeExceptionnel">Congé exceptionnel ?</label>
+    <input type="checkbox" id="congeExceptionnel" name="congeExceptionnel">
+ 
+    
+    <div id="congeExceptionnelInputs" style="display: none;">
+        <label for="pieceJointe">Pièce jointe</label>
+        <input type="file" id="actual-btn" hidden/>
+
+<!-- our custom upload button -->
+<label name="upload" for="actual-btn"> + Attacher piece jointe</label>
+
+<!-- name of file chosen -->
+<span id="file-chosen">Aucun fichier attache</span>
+
+<br>
+    <br>
+
+    <br>
+    <br>
+        
+        <label for="remarque">Remarque</label>
+        <textarea name="remarque" id="remarque"></textarea>
+    </div>
+    <br>
+    <br>
+    <br>
+    <br>
     <button type="submit">Envoyer demande de congé</button>
 </form>
+
 
 
     <h2>Vos demandes de congés</h2>
@@ -144,7 +179,7 @@ $result = $query->get_result();
                 <td><?= htmlspecialchars($row['justificatif']) ?></td>
                 <td>
                 <a href="modifier_conge.php?id=<?= $row['id'] ?>"><i class="fas fa-edit edit-icon"></i></a> | 
-                <a href="supprimer_conge.php?id=<?= $row['id'] ?>"><i class="fas fa-trash-alt delete-icon"></i></a>
+                <a class="deleteButton" data-id="<?= $row['id'] ?>"><i class="fas fa-trash-alt delete-icon"></i></a>
             
                 </td>
 
@@ -156,6 +191,60 @@ $result = $query->get_result();
     </table>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script src="get_name.js"></script>
+    <script>
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    var deleteButtons = document.querySelectorAll('.deleteButton');
+
+    deleteButtons.forEach(function(deleteButton) {
+        deleteButton.addEventListener('click', function() {
+            var confirmDelete = confirm("Êtes-vous sûr de vouloir supprimer cette demande de congé ?");
+            if (confirmDelete) {
+                var id = deleteButton.dataset.id;
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'supprimer_conge.php');
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        // Deletion successful
+                        alert("La demande de congé a été supprimée avec succès.");
+                        // You can also remove the deleted item from the DOM if needed
+                    } else {
+                        // Failed to delete
+                        alert("Erreur lors de la suppression de la demande de congé. Veuillez réessayer.");
+                    }
+                };
+                xhr.send('id=' + id);
+            }
+        });
+    });
+});
+
+
+
+const actualBtn = document.getElementById('actual-btn');
+
+const fileChosen = document.getElementById('file-chosen');
+
+actualBtn.addEventListener('change', function(){
+  fileChosen.textContent = this.files[0].name
+})
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var congeExceptionnelCheckbox = document.getElementById('congeExceptionnel');
+        var congeExceptionnelInputs = document.getElementById('congeExceptionnelInputs');
+
+        congeExceptionnelCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                congeExceptionnelInputs.style.display = 'block';
+            } else {
+                congeExceptionnelInputs.style.display = 'none';
+            }
+        });
+    });
+</script>
+
     </div>
 </body>
 </html>
