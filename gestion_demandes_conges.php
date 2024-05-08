@@ -12,13 +12,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $justificatif = $_POST['justificatif'] ?? '';
     $demandeId = $_POST['demandeId'];
 
-    $demandeInfo = $conn->prepare("SELECT email, dateDebut, dateFin FROM demandesConges WHERE id = ?");
+    $demandeInfo = $conn->prepare("SELECT matricule, dateDebut, dateFin , justificatif FROM demandesConges WHERE id = ?");
     $demandeInfo->bind_param("i", $demandeId);
     $demandeInfo->execute();
     $result = $demandeInfo->get_result();
 
     if ($result->num_rows > 0) {
         $info = $result->fetch_assoc();
+
+        $getUser = $conn->prepare("SELECT nom, prenom FROM utilisateurs WHERE matricule = ?");
+$getUser->bind_param("i", $info['matricule']);
+
+    $getUser->execute();
+    $result = $getUser->get_result();
+    $info = $result->fetch_assoc();
 
         // Vérifier si les dates sont non nulles avant de les utiliser
         if ($info['dateDebut'] !== null && $info['dateFin'] !== null) {
@@ -62,93 +69,63 @@ $result = $conn->query("SELECT * FROM demandesConges WHERE statut = 'En attente'
 <head>
     <meta charset="UTF-8">
     <title>Gestion des Demandes de Congés</title>
-    <style>
-        body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
-    padding: 20px;
-}
-
-h1 {
-    color: #333;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-}
-
-th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
-
-th {
-    background-color: #4CAF50;
-    color: white;
-}
-
-tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
-
-input[type="text"], textarea {
-    width: 95%;
-    padding: 5px;
-    margin-top: 4px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-button {
-    background-color: #008CBA;
-    color: white;
-    padding: 10px 15px;
-    margin: 5px 0;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #007B8A;
-}
-
-.form-container {
-    margin-bottom: 20px;
-}
-
-        </style>
+    <link rel="stylesheet" href="navbar.css">
+    <link rel="stylesheet" href="styles/gestion_demande_conges.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
 </head>
 <body>
+<div class="navbar">
+        <a class="logo" href="RH.html"><img src="badrPFE.png" alt="Accueil"></a>
+        <a href="gestion_employe.php">Gestion des employés</a>
+        <a href="gestion_demandes_conges.php">Gestion des congés</a>
+        <a href="gestion_absences_superviseur.php">Gestion des absences</a>
+        <a href="gestion_demandes_sorties.php">Gestion des sorties</a>
+        <div class="user-info">
+            <span id="userWelcome"></span>
+            <button class="logout-button" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+    </div>
     <h1>Gestion des Demandes de Congés</h1>
+    <div class="container">
     <table>
         <tr>
+            <th>Matriucle</th>
             <th>Employé</th>
             <th>Date de début</th>
             <th>Date de fin</th>
+            <th>Justificatif</th>
             <th>Action</th>
         </tr>
         <?php while ($row = $result->fetch_assoc()): ?>
-        <tr>
-            <td><?= htmlspecialchars($row['email']) ?></td>
-            <td><?= htmlspecialchars($row['dateDebut']) ?></td>
-            <td><?= htmlspecialchars($row['dateFin']) ?></td>
-            <td>
-                <div class="form-container">
-                    <form method="post">
-                        <input type="hidden" name="demandeId" value="<?= $row['id'] ?>">
-                        <input type="text" name="justificatif" placeholder="Justificatif (facultatif)">
-                        <button type="submit" name="decision" value="accepter">Accepter</button>
-                        <button type="submit" name="decision" value="refuser">Refuser</button>
-                    </form>
-                </div>
-            </td>
-        </tr>
-        <?php endwhile; ?>
+    <?php
+    $getUser = $conn->prepare("SELECT nom, prenom FROM utilisateurs WHERE matricule = ?");
+    $getUser->bind_param("i", $row['matricule']);
+    $getUser->execute();
+    $userInfo = $getUser->get_result()->fetch_assoc();
+    ?>
+    <tr>
+    <td><?= htmlspecialchars($row['matricule']) ?></td>
+        <td><?= htmlspecialchars($userInfo['nom'] . ' ' . $userInfo['prenom']) ?></td>
+        <td><?= htmlspecialchars($row['dateDebut']) ?></td>
+        <td><?= htmlspecialchars($row['dateFin']) ?></td>
+        <td><?= htmlspecialchars($row['justificatif']) ?></td>
+        <td>
+            <div class="form-container">
+                <form method="post">
+                    <input type="hidden" name="demandeId" value="<?= $row['id'] ?>">
+                    <input type="textarea" name="justificatif" placeholder="Justificatif (facultatif)">
+                    <button type="submit" name="decision" value="accepter">Accepter</button>
+                    <button type="submit" name="decision" value="refuser">Refuser</button>
+                </form>
+            </div>
+        </td>
+    </tr>
+<?php endwhile; ?>
+
     </table>
+    </div>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="get_name.js"></script>
 </body>
 </html>
 <?php

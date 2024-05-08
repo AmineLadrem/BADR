@@ -1,0 +1,90 @@
+body {
+    font-family: Consolas, monospace;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    padding-bottom: 350px;
+}
+button[value="accepter"] {
+    color: #fff;
+    margin-right: 5px;
+    background-color: #4CAF50;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+button[value="accepter"]:hover {
+    background-color: #45a049;
+}
+
+button[value="refuser"] {
+    color: #fff;
+    margin-right: 5px;
+    background-color: #dd3939;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+button[value="refuser"]:hover {
+    background-color: #e41d1d;
+}
+
+input[type="textarea"]  {
+    width: 200px;
+    height: 100px; /* Adjust the width as needed */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table th,
+table td {
+    
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+    font-weight: bold;
+}
+ 
+
+table th {
+    background-color: #148d04;
+    color: white;
+}
+
+table tr {
+    transition: background-color 0.3s;
+}
+
+table tr:hover {
+    background-color: #f2f2f2;
+}
