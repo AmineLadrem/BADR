@@ -1,0 +1,112 @@
+body {
+    font-family: Consolas, monospace;
+    margin: 0;
+    padding: 0;
+    
+}
+
+.container {
+    padding: 20px;
+}
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+button[value="accepter"] {
+    color: #fff;
+    margin-right: 5px;
+    background-color: #4CAF50;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+button[value="accepter"]:hover {
+    background-color: #45a049;
+}
+
+button[value="refuser"] {
+    color: #fff;
+    margin-right: 5px;
+    background-color: #dd3939;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+button[value="refuser"]:hover {
+    background-color: #e41d1d;
+}
+ 
+
+/* Form Styling */
+form {
+    margin-bottom: 20px;
+}
+
+form label {
+    display: block; /* Display labels as block elements */
+    margin-bottom: 5px; /* Add some space between labels and inputs */
+}
+
+form input[type="date"],
+form textarea {
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 20%;
+    box-sizing: border-box;
+}
+
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table th,
+table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+}
+
+table th {
+    background-color: #148d04;
+    color: white;
+}
+
+table tr {
+    transition: background-color 0.3s;
+}
+
+table tr:hover {
+    background-color: #f2f2f2;
+}
+
+ 
+
+/* Error Message Styling */
+.error {
+    color: #f00;
+    margin-bottom: 10px;
+}
+
+
+.edit-icon {
+    color: orange;
+}
+
+.delete-icon {
+    color: red;
+}

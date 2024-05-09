@@ -62,10 +62,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 // Récupérer les demandes de congés de l'utilisateur connecté
-$query = $conn->prepare("SELECT  id, dateDebut, dateFin, statut, justificatif FROM demandesConges WHERE email = ?");
+$query = $conn->prepare("SELECT  id, dateDebut, dateFin, statut, justificatif FROM demandesConges WHERE matricule = ?");
 
 
-$query->bind_param("s", $email);
+$query->bind_param("s", $matricule);
 $query->execute();
 $result = $query->get_result();
 ?>

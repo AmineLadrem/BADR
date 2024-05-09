@@ -8,6 +8,7 @@ if (!isset($_SESSION['email'])) {
 }
 
 $email = $_SESSION['email'];
+$matricule = $_SESSION['matricule'];
 $dateToday = date("Y-m-d");  // Récupère la date d'aujourd'hui au format année-mois-jour
 
 // Gestion de CSRF token
@@ -40,9 +41,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 // Récupérer les absences de l'utilisateur connecté
-$query = $conn->prepare("SELECT id, date_debut, date_fin, motif, statut FROM absences WHERE email_utilisateur = ?");
+$query = $conn->prepare("SELECT id, date_debut, date_fin, motif, statut FROM absences WHERE matricule = ?");
 
-$query->bind_param("s", $email);
+$query->bind_param("s", $matricule);
 $query->execute();
 $result = $query->get_result();
 ?>

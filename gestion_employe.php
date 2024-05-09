@@ -277,6 +277,8 @@ $result = $conn->query($sql);
                     <th>Statut</th>
                     <th>Service</th>
                     <th>Poste</th>
+                    <th>Diplome</th>
+                    <th>Experience</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -306,8 +308,10 @@ $result = $conn->query($sql);
                         <td><?= $row["salaire"] ?></td>
                         <td><?= $row["statut"] ?></td>
                         <td><?= $row["service"] ?></td>
+                        <td><a><i class="fas fa-plus add" style="color: #148d04;     padding-left: 14px;"></i></a></td>
+                        <td><a><i class="fas fa-plus add" style="color: #148d04;     padding-left: 14px;"></i></a></td>
                         <td><?= $row["poste"] ?></td>
-                        <td> <a><i class="fas fa-edit"></i></a> <a><i class="fas fa-trash-alt"></i></a> </td>
+                        <td> <a><i class="fas fa-edit" style="color: orange;"></i></a> <a><i class="fas fa-trash-alt" style="color: red;"></i></a> </td>
 
                     </tr>
                 <?php endwhile; ?>

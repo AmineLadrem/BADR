@@ -72,6 +72,10 @@ h1 {
     margin-bottom: 20px;
 }
 
+.add{
+    color: green;
+}
+
 label {
     display: block;
     font-weight: bold;

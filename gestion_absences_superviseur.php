@@ -34,64 +34,27 @@ $result = $conn->query("SELECT * FROM absences WHERE statut = 'en attente'");
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Gestion des Absences (Superviseur)</title>
-    <style>
-       body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
-    padding: 20px;
-}
+    <title>Gestion des Absences</title>
 
-h1 {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-}
-
-th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
-
-th {
-    background-color: #4CAF50;
-    color: white;
-}
-
-tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
-
-button {
-    background-color: #008CBA;
-    color: white;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #005f80;
-}
-
-.error {
-    color: red;
-    font-size: 16px;
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-    </style>
+    <link rel="stylesheet" href="navbar.css">
+    <link rel="stylesheet" href="styles/gestion_demandes_absences.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
 </head>
 <body>
-    <h1>Gestion des Absences (Superviseur)</h1>
+<div class="navbar">
+        <a class="logo" href="RH.html"><img src="badrPFE.png" alt="Accueil"></a>
+        <a href="gestion_employe.php">Gestion des employés</a>
+        <a href="gestion_demandes_conges.php">Gestion des congés</a>
+        <a href="gestion_absences_superviseur.php">Gestion des absences</a>
+        <a href="gestion_demandes_sorties.php">Gestion des sorties</a>
+ 
+        <div class="user-info">
+            <span id="userWelcome"></span>
+            <button class="logout-button" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+    </div>
+    <div class="container">
+    <h1>Gestion des Absences  </h1>
     <?php if ($result->num_rows > 0): ?>
         <table>
             <thead>
@@ -113,8 +76,8 @@ button:hover {
                         <td>
                             <form method="post">
                                 <input type="hidden" name="absenceId" value="<?= $row['id'] ?>">
-                                <button type="submit" name="decision" value="approuve">Approuver</button>
-                                <button type="submit" name="decision" value="refuse">Refuser</button>
+                                <button type="submit" name="decision" value="accepter">Accepter</button>
+                    <button type="submit" name="decision" value="refuser">Refuser</button>
                             </form>
                         </td>
                     </tr>
@@ -124,6 +87,9 @@ button:hover {
     <?php else: ?>
         <p>Aucune absence en attente.</p>
     <?php endif; ?>
+    </div>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="get_name.js"></script>
 </body>
 </html>
 
