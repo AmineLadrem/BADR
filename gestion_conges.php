@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $updateDays->execute();
             $updateDays->close();
 
-            $stmt = $conn->prepare("INSERT INTO demandesConges (email, dateDebut, dateFin, justificatif, statut) VALUES (?, ?, ?, ?, 'En attente')");
+            $stmt = $conn->prepare("INSERT INTO conge (email, dateDebut, dateFin, justificatif, statut) VALUES (?, ?, ?, ?, 'En attente')");
             $stmt->bind_param("ssss", $email, $dateDebut, $dateFin, $justificatif);
             $stmt->execute();
             $stmt->close();
@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 // Récupérer les demandes de congés de l'utilisateur connecté
-$query = $conn->prepare("SELECT  id, dateDebut, dateFin, statut, justificatif FROM demandesConges WHERE matricule = ?");
+$query = $conn->prepare("SELECT  id, dateDebut, dateFin, statut, justificatif FROM conge WHERE matricule = ?");
 
 
 $query->bind_param("s", $matricule);

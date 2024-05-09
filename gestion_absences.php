@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 // Récupérer les absences de l'utilisateur connecté
-$query = $conn->prepare("SELECT id, date_debut, date_fin, motif, statut FROM absences WHERE matricule = ?");
+$query = $conn->prepare("SELECT id, date_debut, date_fin, motif, statut FROM absence WHERE matricule = ?");
 
 $query->bind_param("s", $matricule);
 $query->execute();

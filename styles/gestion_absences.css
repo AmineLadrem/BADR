@@ -19,6 +19,7 @@ form {
 form label {
     display: block; /* Display labels as block elements */
     margin-bottom: 5px; /* Add some space between labels and inputs */
+    font-weight: bold;
 }
 
 form input[type="date"],

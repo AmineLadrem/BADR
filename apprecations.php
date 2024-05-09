@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $point_faibles = $_POST['point_faibles'];
 
     // Insérer les données dans la table des appréciations
-    $sql_insert = "INSERT INTO appreciations (matricule, note_assiduite, note_travail,note_absences, point_fort, point_faibles) VALUES (?,?,?, ?, ?, ?)";
+    $sql_insert = "INSERT INTO appreciation (matricule, note_assiduite, note_travail,note_absences, point_fort, point_faibles) VALUES (?,?,?, ?, ?, ?)";
     $stmt_insert = $conn->prepare($sql_insert);
     $stmt_insert->bind_param("sidiss", $matricule, $note_assiduite, $note_travail, $note_absences, $point_fort, $point_faibles);
     $stmt_insert->execute();
@@ -381,7 +381,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     // Construction de la requête SQL en fonction du filtrage par matricule
                     $sql = "SELECT u.matricule, u.nom, u.prenom, a.note_assiduite, a.note_travail, a.note_absences, a.point_fort, a.point_faibles
-            FROM appreciations a  , utilisateurs u 
+            FROM appreciation a  , utilisateurs u 
            where a.matricule = u.matricule";
                     if (!empty($filter_matricule)) {
                         $sql .= " and u.matricule LIKE '%$filter_matricule%'";

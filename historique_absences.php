@@ -194,7 +194,6 @@ a:hover {
                 <th>Date de Début</th>
                 <th>Date de Fin</th>
                 <th>statut</th>
-                <th>email_utilisateur</th>
 
 
                 <!-- Ajoutez d'autres colonnes si nécessaire -->
@@ -209,8 +208,8 @@ a:hover {
     $filter_matricule = isset($_GET['matricule']) ? $_GET['matricule'] : '';
 
     // Construction de la requête SQL en fonction du filtrage par matricule
-    $sql = "SELECT a.id,a.date_debut,a.date_fin,a.motif,a.statut,a.email_utilisateur ,u.matricule, u.nom, u.prenom	,u.email  FROM absences a , utilisateurs u 
-    where u.email=a.email_utilisateur ";
+    $sql = "SELECT a.id,a.date_debut,a.date_fin,a.motif,a.statut ,u.matricule, u.nom, u.prenom	,u.email  FROM absence a , utilisateurs u 
+    where u.matricule=a.matricule ";
     if (!empty($filter_matricule)) {
         $sql .= " and u.matricule LIKE '%$filter_matricule%'";
     }
@@ -227,8 +226,7 @@ a:hover {
             <td><?= $row["motif"] ?></td>
             <td><?= $row["date_debut"] ?></td>
             <td><?= $row["date_fin"] ?></td>
-            <td><?= $row["statut"] ?></td>
-            <td><?= $row["email_utilisateur"] ?></td>
+            <td><?= $row["statut"] ?></td>            
             
         </tr>
     <?php endwhile; ?>

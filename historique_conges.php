@@ -9,7 +9,7 @@ if (!isset($_SESSION['email']) || $_SESSION['est_superieur_hierarchique'] != 1) 
 }
 
 // Récupérer l'historique des congés depuis la base de données
-$sql = "SELECT * FROM demandesconges";
+$sql = "SELECT * FROM conge";
 $result = $conn->query($sql);
 ?>
 
@@ -194,8 +194,8 @@ $result = $conn->query($sql);
 
     // Construction de la requête SQL en fonction du filtrage par matricule
     $sql = "SELECT u.matricule, u.nom, u.prenom, dc.dateDebut, dc.dateFin, dc.justificatif, dc.statut, u.email 
-            FROM demandesconges dc  , utilisateurs u 
-           where dc.email = u.email";
+            FROM conge dc  , utilisateurs u 
+           where dc.matricule = u.matricule";
     if (!empty($filter_matricule)) {
         $sql .= " and u.matricule LIKE '%$filter_matricule%'";
     }

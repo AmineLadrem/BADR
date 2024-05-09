@@ -13,7 +13,7 @@ $matricule = $_SESSION['matricule'];
 $nom = $_SESSION['nom'];
 
 // Récupérer les appréciations de l'utilisateur
-$stmt = $conn->prepare("SELECT * FROM appreciations WHERE matricule = ?");
+$stmt = $conn->prepare("SELECT * FROM appreciation WHERE matricule = ?");
 $stmt->bind_param("s", $matricule);
 $stmt->execute();
 $result = $stmt->get_result();
