@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 // Récupérer les absences en attente
-$result = $conn->query("SELECT * FROM absences WHERE statut = 'en attente'");
+$result = $conn->query("SELECT * FROM absence WHERE statut = 'en attente'");
 ?>
 
 <!DOCTYPE html>
@@ -37,7 +37,7 @@ $result = $conn->query("SELECT * FROM absences WHERE statut = 'en attente'");
     <title>Gestion des Absences</title>
 
     <link rel="stylesheet" href="navbar.css">
-    <link rel="stylesheet" href="styles/gestion_demandes_absences.css">
+    <link rel="stylesheet" href="styles/gestion_demandes_absence.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
 </head>
 <body>
@@ -59,7 +59,7 @@ $result = $conn->query("SELECT * FROM absences WHERE statut = 'en attente'");
         <table>
             <thead>
                 <tr>
-                    <th>Email Utilisateur</th>
+                    <th>Nom</th>
                     <th>Date Début</th>
                     <th>Date Fin</th>
                     <th>Motif</th>
@@ -67,21 +67,35 @@ $result = $conn->query("SELECT * FROM absences WHERE statut = 'en attente'");
                 </tr>
             </thead>
             <tbody>
-                <?php while($row = $result->fetch_assoc()): ?>
-                    <tr>
-                        <td><?= isset($row["email_utilisateur"]) ? $row["email_utilisateur"] : "Non défini" ?></td>
-                        <td><?= isset($row["date_debut"]) ? $row["date_debut"] : "Non défini" ?></td>
-                        <td><?= isset($row["date_fin"]) ? $row["date_fin"] : "Non défini" ?></td>
-                        <td><?= isset($row["motif"]) ? $row["motif"] : "Non défini" ?></td>
-                        <td>
-                            <form method="post">
-                                <input type="hidden" name="absenceId" value="<?= $row['id'] ?>">
-                                <button type="submit" name="decision" value="accepter">Accepter</button>
-                    <button type="submit" name="decision" value="refuser">Refuser</button>
-                            </form>
-                        </td>
-                    </tr>
-                <?php endwhile; ?>
+            <?php
+// Inside the while loop where you fetch each row of absence
+while ($row = $result->fetch_assoc()): 
+    // Prepare and execute query to get user information
+    $getUser = $conn->prepare("SELECT nom, prenom FROM utilisateurs WHERE matricule = ?");
+    $getUser->bind_param("i", $row['matricule']);
+    $getUser->execute();
+    // Fetch user information
+    $userInfo = $getUser->get_result()->fetch_assoc();
+?>
+
+<!-- Inside the table row -->
+<tr>
+    <td><?= htmlspecialchars($userInfo['nom'] . ' ' . $userInfo['prenom']) ?></td>
+    <td><?= htmlspecialchars($row['date_debut']) ?></td>
+    <td><?= htmlspecialchars($row['date_fin']) ?></td>
+    <td><?= htmlspecialchars($row['motif']) ?></td>
+    <td>
+        <div class="form-container">
+            <form method="post">
+                <input type="hidden" name="absenceId" value="<?= $row['id'] ?>">
+                <button type="submit" name="decision" value="accepte">Accepter</button>
+                <button type="submit" name="decision" value="refuse">Refuser</button>
+            </form>
+        </div>
+    </td>
+</tr>
+<?php endwhile; ?>
+
             </tbody>
         </table>
     <?php else: ?>

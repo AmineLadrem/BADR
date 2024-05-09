@@ -8,7 +8,7 @@ if (!isset($_SESSION['email']) || $_SESSION['is_supervisor'] != 1) {
 }
 
 // Execute SQL query to get pending absences
-$stmt = $conn->prepare("SELECT id, matricule, date_sortie, heure_sortie, motif, statut FROM demandes_de_sorties");
+$stmt = $conn->prepare("SELECT id, matricule, date_sortie, heure_sortie, motif, statut FROM sortie");
 $stmt->execute();
 $result = $stmt->get_result();
 ?>

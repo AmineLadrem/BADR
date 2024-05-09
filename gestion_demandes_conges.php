@@ -47,7 +47,7 @@ $getUser->bind_param("i", $info['matricule']);
             }
 
             // Mettre à jour le statut de la demande
-            $stmt = $conn->prepare("UPDATE demandesConges SET statut = ?, justificatif = ? WHERE id = ?");
+            $stmt = $conn->prepare("UPDATE conge SET statut = ?, justificatif = ? WHERE id = ?");
             $stmt->bind_param("ssi", $status, $justificatif, $demandeId);
             $stmt->execute();
             $stmt->close();
@@ -61,7 +61,7 @@ $getUser->bind_param("i", $info['matricule']);
     }
 }
 
-$result = $conn->query("SELECT * FROM demandesConges WHERE statut = 'En attente'");
+$result = $conn->query("SELECT * FROM conge WHERE statut = 'En attente'");
 ?>
 
 <!DOCTYPE html>

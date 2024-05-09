@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       
         $password = $_POST['password'];
 
-        $stmt2 = $conn->prepare("SELECT email FROM compte WHERE mdp = ?");
+        $stmt2 = $conn->prepare("SELECT matricule FROM compte_utilisateur  WHERE mdp = ?");
         $stmt2->bind_param("s", $password);
         $stmt2->execute();
         $result2 = $stmt2->get_result();
