@@ -48,7 +48,7 @@ while ($row = $result->fetch_assoc()) {
     </div>
     <div class="container">
         <h1>Mes Appréciations</h1>
-        <p>Bienvenue, <?php echo $nom; ?></p>
+        <br>
         <table>
             <thead>
                 <tr>

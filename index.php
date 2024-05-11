@@ -68,75 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion - BADR</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f4f9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-
-            background-image: radial-gradient(circle at 24% 76%, rgb(253, 255, 255) 0%, rgb(253, 255, 255) 10%, transparent 10%, transparent 100%), radial-gradient(circle at 76% 76%, rgb(253, 255, 255) 0%, rgb(253, 255, 255) 10%, transparent 10%, transparent 100%), radial-gradient(circle at 76% 24%, rgb(253, 255, 255) 0%, rgb(253, 255, 255) 10%, transparent 10%, transparent 100%), radial-gradient(circle at 24% 24%, rgb(253, 255, 255) 0%, rgb(253, 255, 255) 10%, transparent 10%, transparent 100%), radial-gradient(circle at center center, rgb(153, 218, 84) 0%, rgb(153, 218, 84) 71%, transparent 71%, transparent 100%), linear-gradient(90deg, rgb(253, 255, 255), rgb(253, 255, 255));
-            background-size: 23px 23px;
-        }
-
-        .login-container {
-            background: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            width: 350px;
-            max-width: 90%;
-            box-sizing: border-box;
-        }
-
-        .login-container img {
-            width: 100px;
-            border-radius: 50%;
-            margin-bottom: 20px;
-        }
-
-        .login-container h2 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        .login-container input[type="email"],
-        .login-container input[type="password"] {
-            width: calc(100% - 20px);
-            padding: 12px;
-            margin-top: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-
-        .login-container button {
-            width: 100%;
-            padding: 12px;
-            background-color: #148d04;
-            border: none;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
-
-        .login-container button:hover {
-            background-color: #003d82;
-        }
-
-        .error {
-            color: red;
-            margin-top: 10px;
-            text-align: left;
-        }
-    </style>
+    <link rel="stylesheet" href="styles/index.css">
 </head>
 
 <body>
@@ -146,8 +78,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <form action="index.php" method="post">
             <input type="email" name="email" placeholder="Entrez votre email" required>
             <input type="password" name="password" placeholder="Entrez votre mot de passe" required>
+            <a class="pw" href="#">Mot de passe oublié?</a>
+            <div class="line"></div>
             <button type="submit"><i class="fas fa-sign-in-alt"></i> Connexion</button>
+
         </form>
+        
         <?php if (isset($error)) echo "<p class='error'>$error</p>"; ?>
     </div>
 

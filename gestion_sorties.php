@@ -16,37 +16,39 @@ if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// Traitement du formulaire de demande d'absence
+// Traitement du formulaire de demande de sortie
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         die('CSRF token validation failed');
     }
 
-    $dateDebut = $_POST['dateDebut'];
-    $dateFin = $_POST['dateFin'];
+    $dateSortie = $_POST['dateSortie'];
+    $heureSortie = $_POST['heureSortie'];
     $justificatif = $_POST['justificatif'] ?? '';
 
-    if ($dateDebut >= $dateToday && $dateFin >= $dateDebut) {
-        $stmt = $conn->prepare("INSERT INTO absences (email_utilisateur, date_debut, date_fin, motif, statut) VALUES (?, ?, ?, ?, 'En attente')");
-        $stmt->bind_param("ssss", $email, $dateDebut, $dateFin, $justificatif);
+    if ($dateSortie >= $dateToday) {
+        $stmt = $conn->prepare("INSERT INTO sortie (matricule, date_sortie, heure_sortie, motif, statut) VALUES (?, ?, ?, ?, 'En attente')");
+        $stmt->bind_param("ssss", $matricule, $dateSortie, $heureSortie, $justificatif);
         $stmt->execute();
         $stmt->close();
         
         // Redirection pour éviter la resoumission du formulaire
-        header("Location: gestion_absences.php");
+        header("Location: gestion_sorties.php");
         exit;
     } else {
-        $error = "Les dates fournies sont invalides.";
+        $error = "La date de sortie fournie est invalide.";
     }
 }
 
-// Récupérer les absences de l'utilisateur connecté
-$query = $conn->prepare("SELECT id, date_sortie ,heure_sortie, motif, statut FROM sortie WHERE matricule = ?");
+// Récupérer les sorties de l'utilisateur connecté
+$query = $conn->prepare("SELECT id, date_sortie ,heure_sortie, motif, statut FROM sortie WHERE matricule = ? ORDER BY CASE WHEN statut = 'En attente' THEN 1 WHEN statut = 'Accepté' THEN 2 ELSE 3 END");
+
 
 $query->bind_param("s", $matricule);
 $query->execute();
 $result = $query->get_result();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -73,36 +75,36 @@ $result = $query->get_result();
 </head>
 <body>
 <div class="navbar">
-        <a class="logo" href="menu_utilisateurs_nrml.html"><img src="badrPFE.png" alt="Accueil"></a>
-        <a href="gestion_conges.php">Gestion des congés</a>
-        <a href="gestion_absences.php">Gestion des absences</a>
-        <a href="gestion_sorties.php">Gestion des sorties</a>
-        <a href="mes_appreciations.php">Mes appréciations</a>
-        <div class="user-info">
-            <span id="userWelcome"></span>
-            <button class="logout-button" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
-        </div>
+    <a class="logo" href="menu_utilisateurs_nrml.html"><img src="badrPFE.png" alt="Accueil"></a>
+    <a href="gestion_conges.php">Gestion des congés</a>
+    <a href="gestion_absences.php">Gestion des absences</a>
+    <a href="gestion_sorties.php">Gestion des sorties</a>
+    <a href="mes_appreciations.php">Mes appréciations</a>
+    <div class="user-info">
+        <span id="userWelcome"></span>
+        <button class="logout-button" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
     </div>
-    <div class="container">
+</div>
+<div class="container">
     <h1>Gestion des Sorties</h1>
     <?php if (isset($error)): ?>
     <p class="error"><?= $error ?></p>
     <?php endif; ?>
     <form method="post" action="">
-    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-    
-    <label for="dateDebut">Date de début</label>
-    <input type="date" name="dateDebut" id="dateDebut" min="<?= $dateToday ?>" required>
-    
-    <label for="dateFin">Date de fin</label>
-    <input type="date" name="dateFin" id="dateFin" min="<?= $dateToday ?>" required>
-    
-    <label for="justificatif">Justificatif (facultatif)</label>
-    <textarea name="justificatif" id="justificatif"></textarea>
-    <br>
-    
-    <button type="submit">Envoyer demande de sortie</button>
-</form>
+        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+        
+        <label for="dateSortie">Date de sortie</label>
+        <input type="date" name="dateSortie" id="dateSortie" min="<?= $dateToday ?>" required>
+        
+        <label for="heureSortie">Heure de sortie</label>
+        <input type="time" name="heureSortie" id="heureSortie" min="<?= $dateToday ?>" required>
+        
+        <label for="justificatif">Justificatif (facultatif)</label>
+        <textarea name="justificatif" id="justificatif"></textarea>
+        <br>
+        
+        <button type="submit"><i class="fas fa-paper-plane"></i> Envoyer demande de sortie</button>
+    </form>
     <h2>Vos demandes de sortie</h2>
     <table>
         <thead>
@@ -117,23 +119,55 @@ $result = $query->get_result();
         <tbody>
             <?php while ($row = $result->fetch_assoc()): ?>
             <tr >
-            <td><?= htmlspecialchars($row['date_sortie']) ?></td>
+                <td><?= htmlspecialchars($row['date_sortie']) ?></td>
                 <td><?= htmlspecialchars($row['heure_sortie']) ?></td>
                 <td><?= htmlspecialchars($row['motif']) ?></td>
                 <td><?= htmlspecialchars($row['statut']) ?></td>
                 <td>
-                <a href="modifier_absence.php?id=<?= $row['id'] ?>"><i class="fas fa-edit edit-icon"></i></a> | 
-                <a href="supprimer_sortie.php?id=<?= $row['id'] ?>" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette sortie?');"><i class="fas fa-trash-alt delete-icon"></i></a>
-            </td>
+                    <?php if ($row['statut'] === 'En attente'): ?>
+                        <a href="modifier_conge.php?id=<?= $row['id'] ?>"><i class="fas fa-edit edit-icon"></i></a> | 
+                        <a class="deleteButton" data-id="<?= $row['id'] ?>"><i class="fas fa-trash-alt delete-icon"></i></a>
+                    <?php endif; ?>
+                </td>
             </tr>
             <?php endwhile; ?>
         </tbody>
     </table>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <script src="get_name.js"></script>
-    </div>
+</div>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script src="get_name.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var deleteButtons = document.querySelectorAll('.deleteButton');
+
+    deleteButtons.forEach(function(deleteButton) {
+        deleteButton.addEventListener('click', function() {
+            var confirmDelete = confirm("Êtes-vous sûr de vouloir supprimer cette demande de sortie ?");
+            if (confirmDelete) {
+                var id = deleteButton.dataset.id;
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'supprimer_sortie.php');
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        // Deletion successful
+                        alert("La demande de sortie a été supprimée avec succès.");
+                        // Redirect to gestion_sorties.php
+                        window.location.href = 'gestion_sorties.php';
+                    } else {
+                        // Failed to delete
+                        alert("Erreur lors de la suppression de la demande de sortie. Veuillez réessayer.");
+                    }
+                };
+                xhr.send('id=' + id);
+            }
+        });
+    });
+});
+</script>
 </body>
 </html>
+
 <?php
 $conn->close();
 ?>

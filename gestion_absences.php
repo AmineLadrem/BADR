@@ -1,22 +1,21 @@
 <?php
 session_start();
-include 'db.php'; // Assurez-vous que ce fichier inclut votre connexion à la base de données
+include 'db.php';
 
 if (!isset($_SESSION['email'])) {
-    header('Location: index.php'); // Rediriger vers la page de connexion si aucun utilisateur n'est connecté
+    header('Location: index.php');
     exit;
 }
 
 $email = $_SESSION['email'];
 $matricule = $_SESSION['matricule'];
-$dateToday = date("Y-m-d");  // Récupère la date d'aujourd'hui au format année-mois-jour
-
-// Gestion de CSRF token
+$dateToday = date("Y-m-d");
+ 
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// Traitement du formulaire de demande d'absence
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         die('CSRF token validation failed');
@@ -27,12 +26,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $justificatif = $_POST['justificatif'] ?? '';
 
     if ($dateDebut >= $dateToday && $dateFin >= $dateDebut) {
-        $stmt = $conn->prepare("INSERT INTO absences (email_utilisateur, date_debut, date_fin, motif, statut) VALUES (?, ?, ?, ?, 'En attente')");
-        $stmt->bind_param("ssss", $email, $dateDebut, $dateFin, $justificatif);
+        $stmt = $conn->prepare("INSERT INTO absence (matricule, date_debut, date_fin, motif, statut) VALUES (?, ?, ?, ?, 'En attente')");
+        $stmt->bind_param("ssss", $matricule, $dateDebut, $dateFin, $justificatif);
         $stmt->execute();
         $stmt->close();
-        
-        // Redirection pour éviter la resoumission du formulaire
+
         header("Location: gestion_absences.php");
         exit;
     } else {
@@ -41,7 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 // Récupérer les absences de l'utilisateur connecté
-$query = $conn->prepare("SELECT id, date_debut, date_fin, motif, statut FROM absence WHERE matricule = ?");
+$query = $conn->prepare("SELECT id, date_debut, date_fin, motif, statut FROM absence WHERE matricule = ? ORDER BY CASE WHEN statut = 'En attente' THEN 1 WHEN statut = 'Accepté' THEN 2 ELSE 3 END");
+
 
 $query->bind_param("s", $matricule);
 $query->execute();
@@ -122,15 +121,46 @@ $result = $query->get_result();
                 <td><?= htmlspecialchars($row['motif']) ?></td>
                 <td><?= htmlspecialchars($row['statut']) ?></td>
                 <td>
-                <a href="modifier_absence.php?id=<?= $row['id'] ?>"><i class="fas fa-edit edit-icon"></i></a> | 
-                <a href="supprimer_absence.php?id=<?= $row['id'] ?>" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette absence?');"><i class="fas fa-trash-alt delete-icon"></i></a>
-            </td>
+                    <?php if ($row['statut'] === 'En attente'): ?>
+                        <a href="modifier_conge.php?id=<?= $row['id'] ?>"><i class="fas fa-edit edit-icon"></i></a> | 
+                        <a class="deleteButton" data-id="<?= $row['id'] ?>"><i class="fas fa-trash-alt delete-icon"></i></a>
+                    <?php endif; ?>
+                </td>
             </tr>
             <?php endwhile; ?>
         </tbody>
     </table>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script src="get_name.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    var deleteButtons = document.querySelectorAll('.deleteButton');
+
+    deleteButtons.forEach(function(deleteButton) {
+        deleteButton.addEventListener('click', function() {
+            var confirmDelete = confirm("Êtes-vous sûr de vouloir supprimer cette demande d'absence ?");
+            if (confirmDelete) {
+                var id = deleteButton.dataset.id;
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'supprimer_absence.php');
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        // Deletion successful
+                        alert("La demande d'absence a été supprimée avec succès.");
+                        // Redirect to gestion_conges.php
+                        window.location.href = 'gestion_absences.php';
+                    } else {
+                        // Failed to delete
+                        alert("Erreur lors de la suppression de la demande d'absence. Veuillez réessayer.");
+                    }
+                };
+                xhr.send('id=' + id);
+            }
+        });
+    });
+});
+    </script>
     </div>
 </body>
 </html>
