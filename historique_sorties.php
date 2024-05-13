@@ -9,7 +9,7 @@ if (!isset($_SESSION['email']) || $_SESSION['est_superieur_hierarchique'] != 1) 
 }
 
 // Récupérer l'historique des congés depuis la base de données
-$sql = "SELECT * FROM conge";
+$sql = "SELECT * FROM sortie ORDER BY CASE WHEN statut = 'En attente' THEN 1 WHEN statut = 'Accepté' THEN 2 ELSE 3 END";
 $result = $conn->query($sql);
 ?>
 
@@ -150,6 +150,37 @@ $result = $conn->query($sql);
     h1 {
         text-align: center;
     }
+    button[value="accepter"] {
+    color: #fff;
+    margin-right: 5px;
+    background-color: #4CAF50;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+button[value="accepter"]:hover {
+    background-color: #45a049;
+}
+
+button[value="refuser"] {
+    color: #fff;
+    margin-right: 5px;
+    background-color: #dd3939;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+button[value="refuser"]:hover {
+    background-color: #e41d1d;
+}
     </style>
 </head>
 
@@ -185,7 +216,9 @@ $result = $conn->query($sql);
             <th>Date de sortie</th>
             <th>Heure de sortie</th>
             <th>Motif</th>
+            <th>Décision de RH</th>
             <th>Statut</th>
+            <th>Actions</th> <!-- New column for actions -->
            
         </tr>
     </thead>
@@ -195,9 +228,15 @@ $result = $conn->query($sql);
     $filter_matricule = isset($_GET['matricule']) ? $_GET['matricule'] : '';
 
     // Construction de la requête SQL en fonction du filtrage par matricule
-    $sql = "SELECT u.matricule, u.nom, u.prenom, s.date_sortie, s.heure_sortie, s.motif, s.statut
-            FROM sortie s  , utilisateurs u 
-           where s.matricule = u.matricule";
+    $sql = "SELECT u.matricule, u.nom, u.prenom, s.date_sortie, s.heure_sortie, s.motif, s.statut, s.dec_pdg, s.dec_rh
+    FROM sortie s, utilisateurs u 
+    WHERE s.matricule = u.matricule
+    ORDER BY CASE 
+        WHEN s.statut = 'En attente' THEN 1 
+        WHEN s.statut = 'Accepté' THEN 2 
+        ELSE 3 
+    END";
+
     if (!empty($filter_matricule)) {
         $sql .= " and u.matricule LIKE '%$filter_matricule%'";
     }
@@ -214,7 +253,19 @@ $result = $conn->query($sql);
             <td><?= $row["date_sortie"] ?></td>
             <td><?= $row["heure_sortie"] ?></td>
             <td><?= $row["motif"] ?></td>
+            <td><?= $row["dec_rh"] == 1 ? 'Acceptée' : ($row["dec_rh"] == 2 ? 'En attente' : 'Refusée') ?></td> <!-- Display decision de RH -->
             <td><?= $row["statut"] ?></td>
+            <td>
+                <?php if ($row["statut"] == "En attente"): ?>
+                    <?php if ($row["dec_rh"] == 0 || $row["dec_pdg"] == 0): ?>
+                        <!-- Display nothing if either RH or PDG has not made a decision -->
+                    <?php elseif ($row["dec_rh"] == 1 && $row["dec_pdg"] == 1): ?>
+                        <!-- Display buttons if both RH and PDG have made decisions -->
+                        <button value="accepter">Accepter</button>
+                        <button value="refuser">Refuser</button>
+                    <?php endif; ?>
+                <?php endif; ?>
+            </td>
         </tr>
     <?php endwhile; ?>
 

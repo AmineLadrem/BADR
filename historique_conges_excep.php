@@ -196,7 +196,11 @@ $result = $conn->query($sql);
     $sql = "SELECT u.matricule, u.nom, u.prenom, dc.dateDebut, dc.dateFin, dc.justificatif, dc.statut, u.email, ce.excep 
             FROM conge dc , utilisateurs u , conge_excep ce
             where dc.matricule = u.matricule
-           and dc.id = ce.id_cong_excep";
+           and dc.id = ce.id_cong_excep  ORDER BY CASE 
+        WHEN dc.statut = 'En attente' THEN 1 
+        WHEN dc.statut = 'Accepté' THEN 2 
+        ELSE 3 
+    END";
     if (!empty($filter_matricule)) {
         $sql .= " and u.matricule LIKE '%$filter_matricule%'";
     }

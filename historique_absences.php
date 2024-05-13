@@ -209,7 +209,11 @@ a:hover {
 
     // Construction de la requête SQL en fonction du filtrage par matricule
     $sql = "SELECT a.id,a.date_debut,a.date_fin,a.motif,a.statut ,u.matricule, u.nom, u.prenom	,u.email  FROM absence a , utilisateurs u 
-    where u.matricule=a.matricule ";
+    where u.matricule=a.matricule ORDER BY CASE 
+        WHEN a.statut = 'En attente' THEN 1 
+        WHEN a.statut = 'Accepté' THEN 2 
+        ELSE 3 
+    END";
     if (!empty($filter_matricule)) {
         $sql .= " and u.matricule LIKE '%$filter_matricule%'";
     }

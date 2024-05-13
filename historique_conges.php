@@ -148,6 +148,37 @@ $result = $conn->query($sql);
     h1 {
         text-align: center;
     }
+    button[value="accepter"] {
+    color: #fff;
+    margin-right: 5px;
+    background-color: #4CAF50;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+button[value="accepter"]:hover {
+    background-color: #45a049;
+}
+
+button[value="refuser"] {
+    color: #fff;
+    margin-right: 5px;
+    background-color: #dd3939;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+button[value="refuser"]:hover {
+    background-color: #e41d1d;
+}
     </style>
 </head>
 
@@ -184,6 +215,7 @@ $result = $conn->query($sql);
             <th>Date de Fin</th>
             <th>Justificatif</th>
             <th>Statut</th>
+            <th>Actions</th> <!-- New column for actions -->
            
         </tr>
     </thead>
@@ -195,7 +227,11 @@ $result = $conn->query($sql);
     // Construction de la requête SQL en fonction du filtrage par matricule
     $sql = "SELECT u.matricule, u.nom, u.prenom, dc.dateDebut, dc.dateFin, dc.justificatif, dc.statut, u.email 
             FROM conge dc  , utilisateurs u 
-           where dc.matricule = u.matricule";
+           where dc.matricule = u.matricule   ORDER BY CASE 
+        WHEN dc.statut = 'En attente' THEN 1 
+        WHEN dc.statut = 'Accepté' THEN 2 
+        ELSE 3 
+    END";
     if (!empty($filter_matricule)) {
         $sql .= " and u.matricule LIKE '%$filter_matricule%'";
     }
@@ -213,6 +249,12 @@ $result = $conn->query($sql);
             <td><?= $row["dateFin"] ?></td>
             <td><?= $row["justificatif"] ?></td>
             <td><?= $row["statut"] ?></td>
+            <td>
+                        <?php if ($row["statut"] == "En attente"): ?>
+                            <button value="accepter">Accepter</button>
+                            <button value="refuser">Refuser</button>
+                        <?php endif; ?>
+                    </td>
         </tr>
     <?php endwhile; ?>
 
