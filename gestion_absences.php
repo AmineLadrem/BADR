@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $justificatif = $_POST['justificatif'] ?? '';
 
     if ($dateDebut >= $dateToday && $dateFin >= $dateDebut) {
-        $stmt = $conn->prepare("INSERT INTO absence (matricule, date_debut, date_fin, motif, statut) VALUES (?, ?, ?, ?, 'En attente')");
+        $stmt = $conn->prepare("INSERT INTO absence (matricule, date_debut, date_fin, motif, statut) VALUES (?, ?, ?, ?, 'En Attente')");
         $stmt->bind_param("ssss", $matricule, $dateDebut, $dateFin, $justificatif);
         $stmt->execute();
         $stmt->close();
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 // Récupérer les absences de l'utilisateur connecté
-$query = $conn->prepare("SELECT id, date_debut, date_fin, motif, statut FROM absence WHERE matricule = ? ORDER BY CASE WHEN statut = 'En attente' THEN 1 WHEN statut = 'Accepté' THEN 2 ELSE 3 END");
+$query = $conn->prepare("SELECT id, date_debut, date_fin, motif, statut FROM absence WHERE matricule = ? ORDER BY CASE WHEN statut = 'En Attente' THEN 1 WHEN statut = 'Accepté' THEN 2 ELSE 3 END");
 
 
 $query->bind_param("s", $matricule);
@@ -100,7 +100,7 @@ $result = $query->get_result();
     <textarea name="justificatif" id="justificatif"></textarea>
     <br>
     
-    <button type="submit">Envoyer demande d'absence</button>
+    <button type="submit"><i class="fas fa-paper-plane"></i> Envoyer demande d'absence</button>
 </form>
     <h2>Vos absences</h2>
     <table>
@@ -121,8 +121,8 @@ $result = $query->get_result();
                 <td><?= htmlspecialchars($row['motif']) ?></td>
                 <td><?= htmlspecialchars($row['statut']) ?></td>
                 <td>
-                    <?php if ($row['statut'] === 'En attente'): ?>
-                        <a href="modifier_conge.php?id=<?= $row['id'] ?>"><i class="fas fa-edit edit-icon"></i></a> | 
+                    <?php if ($row['statut'] === 'En Attente'): ?>
+                        <a href="modifier_absence.php?id=<?= $row['id'] ?>"><i class="fas fa-edit edit-icon"></i></a> | 
                         <a class="deleteButton" data-id="<?= $row['id'] ?>"><i class="fas fa-trash-alt delete-icon"></i></a>
                     <?php endif; ?>
                 </td>

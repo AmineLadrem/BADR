@@ -35,6 +35,7 @@ form textarea {
 form button[type="submit"] {
     padding: 10px 20px;
     background-color: #148d04;
+    font-weight: bold;
     color: white;
     border: none;
     border-radius: 5px;

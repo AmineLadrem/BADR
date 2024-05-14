@@ -14,11 +14,11 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
     exit;
 }
 
-$id_absence = $_GET['id'];
+$id_sortie = $_GET['id'];
 
 // Récupérer les détails de l'absence à modifier
-$query = $conn->prepare("SELECT * FROM absence WHERE id = ?");
-$query->bind_param("i", $id_absence);
+$query = $conn->prepare("SELECT * FROM sortie WHERE id = ?");
+$query->bind_param("i", $id_sortie);
 $query->execute();
 $result = $query->get_result();
 
@@ -27,7 +27,7 @@ if ($result->num_rows === 0) {
     exit;
 }
 
-$absence = $result->fetch_assoc();
+$sortie = $result->fetch_assoc();
 
 // Traitement du formulaire de modification
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -36,11 +36,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $justificatif = $_POST['justificatif'];
 
     // Mettre à jour l'absence dans la base de données
-    $updateQuery = $conn->prepare("UPDATE absence SET date_debut = ?, date_fin = ?, motif = ? WHERE id = ?");
-    $updateQuery->bind_param("sssi", $dateDebut, $dateFin, $justificatif, $id_absence);
+    $updateQuery = $conn->prepare("UPDATE sortie SET date_sortie = ?, heure_sortie = ?, motif = ? WHERE id = ?");
+    $updateQuery->bind_param("sssi", $dateDebut, $dateFin, $justificatif, $id_sortie);
     $updateQuery->execute();
 
-    header("Location: gestion_absences.php"); // Rediriger vers la page de gestion des absences après la modification
+    header("Location: gestion_sorties.php"); // Rediriger vers la page de gestion des absences après la modification
     exit;
 }
 
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Modifier une absence</title>
+    <title>Modifier une sortie</title>
     <link rel="stylesheet" href="navbar.css">
     <link rel="stylesheet" href="styles/gestion_conge.css">.
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
@@ -68,49 +68,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
     <div class="container">
-    <h1>Modifier une absence</h1>
+    <h1>Modifier une sortie</h1>
     <form method="post" action="">
-        <label for="dateDebut">Date de début :</label>
-        <input type="date" name="dateDebut" value="<?= $absence['date_debut'] ?>" required>
-        <label for="dateFin">Date de fin :</label>
-        <input type="date" name="dateFin" value="<?= $absence['date_fin'] ?>" required>
+        <label for="dateDebut">Date de sortie :</label>
+        <input type="date" name="dateDebut" value="<?= $sortie['date_sortie'] ?>" required>
+        <label for="dateFin">Heure de sortie :</label>
+        <input type="time" name="dateFin" value="<?= $sortie['heure_sortie'] ?>" required>
         <label for="justificatif">Justificatif :</label>
-        <textarea name="justificatif"><?= $absence['motif'] ?></textarea>
+        <textarea name="justificatif"><?= $sortie['motif'] ?></textarea>
         <br>
         <button type="submit"><i class="fas fa-pencil-alt"></i> Modifier</button>
     </form>
     </div>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script src="get_name.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-    var deleteButtons = document.querySelectorAll('.deleteButton');
-
-    deleteButtons.forEach(function(deleteButton) {
-        deleteButton.addEventListener('click', function() {
-            var confirmDelete = confirm("Êtes-vous sûr de vouloir supprimer cette demande d'absence ?");
-            if (confirmDelete) {
-                var id = deleteButton.dataset.id;
-                var xhr = new XMLHttpRequest();
-                xhr.open('POST', 'supprimer_absence.php');
-                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhr.onload = function() {
-                    if (xhr.status === 200) {
-                        // Deletion successful
-                        alert("La demande d'absence a été supprimée avec succès.");
-                        // Redirect to gestion_conges.php
-                        window.location.href = 'gestion_absences.php';
-                    } else {
-                        // Failed to delete
-                        alert("Erreur lors de la suppression de la demande d'absence. Veuillez réessayer.");
-                    }
-                };
-                xhr.send('id=' + id);
-            }
-        });
-    });
-});
-    </script>
 </body>
 </html>
 

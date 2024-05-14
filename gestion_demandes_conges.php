@@ -6,6 +6,7 @@ if (!isset($_SESSION['email']) || $_SESSION['is_supervisor'] != 1) {
     header('Location: index.php');
     exit;
 }
+$dateToday = date("Y-m-d");
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $decision = $_POST['decision'];
@@ -86,6 +87,13 @@ $result = $conn->query("SELECT * FROM conge WHERE statut = 'En attente'");
         </div>
     </div>
     <h1>Gestion des Demandes de Congés</h1>
+    <div class="button-container">
+
+<button onclick="showAddUserPanel()">Liste des Congés</button>
+<button onclick="showUserListPanel()">Congé exceptionnels</button>
+
+</div>
+<div class="right-panel">
     <div class="container">
     <table>
         <tr>
@@ -124,8 +132,95 @@ $result = $conn->query("SELECT * FROM conge WHERE statut = 'En attente'");
 
     </table>
     </div>
+</div>
+<div class="left-panel">
+    <div class="container">
+   
+    <form method="post" action="">
+    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+    
+    <label for="dateDebut">Date de début</label>
+    <input type="date" name="dateDebut" id="dateDebut" min="<?= $dateToday ?>" required>
+    
+    <label for="dateFin">Date de fin</label>
+    <input type="date" name="dateFin" id="dateFin" min="<?= $dateToday ?>" required>
+    
+    <label for="justificatif">Justificatif (facultatif)</label>
+    <textarea name="justificatif" id="justificatif"></textarea>
+    
+    <br>
+
+    <br>
+
+    <label for="congeExceptionnel">Congé exceptionnel ?</label>
+    <input type="checkbox" id="congeExceptionnel" name="congeExceptionnel">
+ 
+    
+    <div id="congeExceptionnelInputs" style="display: none;">
+        <label for="pieceJointe">Pièce jointe</label>
+        <input type="file" id="actual-btn" hidden/>
+
+<!-- our custom upload button -->
+<label name="upload" for="actual-btn"> + Attacher piece jointe</label>
+
+<!-- name of file chosen -->
+<span id="file-chosen">Aucun fichier attache</span>
+
+<br>
+    <br>      
+        <label for="remarque">Remarque</label>
+        <textarea name="remarque" id="remarque"></textarea>
+    </div>
+    <br>
+
+
+    
+    <?php if (isset($error)): ?>
+    <p class="error"><?= $error ?></p>
+    <?php endif; ?>
+    <br>
+    <br>
+    <button type="submit"><i class="fas fa-paper-plane"></i> Envoyer demande de congé</button>
+
+</form>
+
+    </div>
+</div>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script src="get_name.js"></script>
+
+    <script>
+        function showAddUserPanel() {
+            document.querySelector('.left-panel').style.display = 'block';
+            document.querySelector('.right-panel').style.display = 'none';
+        }
+
+        function showUserListPanel() {
+            document.querySelector('.left-panel').style.display = 'none';
+            document.querySelector('.right-panel').style.display = 'block';
+        }
+
+        const actualBtn = document.getElementById('actual-btn');
+
+const fileChosen = document.getElementById('file-chosen');
+
+actualBtn.addEventListener('change', function(){
+  fileChosen.textContent = this.files[0].name
+})
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var congeExceptionnelCheckbox = document.getElementById('congeExceptionnel');
+        var congeExceptionnelInputs = document.getElementById('congeExceptionnelInputs');
+
+        congeExceptionnelCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                congeExceptionnelInputs.style.display = 'block';
+            } else {
+                congeExceptionnelInputs.style.display = 'none';
+            }
+        });
+    });
+    </script>
 </body>
 </html>
 <?php

@@ -28,6 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $dateDebut = $_POST['dateDebut'];
     $dateFin = $_POST['dateFin'];
     $justificatif = $_POST['justificatif'] ?? '';
+    $congeExceptionnel = isset($_POST['congeExceptionnel']) ? $_POST['congeExceptionnel'] : 0;
+    $remarque = $_POST['remarque'];
 
     if ($dateDebut >= $dateToday && $dateFin >= $dateDebut) {
         $debut = new DateTime($dateDebut);
@@ -42,9 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $updateDays->execute();
             $updateDays->close();
 
-            $stmt = $conn->prepare("INSERT INTO conge (matricule, dateDebut, dateFin, justificatif, dec_rh, dec_pdg, statut) VALUES (?, ?, ?, ?, 2, 2, 'En Attente')");
-$stmt->bind_param("ssss", $matricule, $dateDebut, $dateFin, $justificatif);
-
+            $stmt = $conn->prepare("INSERT INTO conge (matricule, dateDebut, dateFin, justificatif, statut) VALUES (?, ?, ?, ?, 'En attente')");
+            $stmt->bind_param("ssss", $matricule, $dateDebut, $dateFin, $justificatif);
             $stmt->execute();
             $stmt->close();
             header("Location: gestion_conges.php");
@@ -56,11 +57,7 @@ $stmt->bind_param("ssss", $matricule, $dateDebut, $dateFin, $justificatif);
         $error = "Les dates fournies sont invalides.";
     }
 }
-$query = $conn->prepare("SELECT  id, dateDebut, dateFin, statut, justificatif FROM conge WHERE matricule = ? ORDER BY CASE 
-WHEN statut = 'En Attente' THEN 1 
-WHEN statut = 'Accepté' THEN 2 
-ELSE 3 
-END");
+$query = $conn->prepare("SELECT  id, dateDebut, dateFin, statut, justificatif FROM conge WHERE matricule = ?");
 
 
 $query->bind_param("s", $matricule);
@@ -120,7 +117,33 @@ $result = $query->get_result();
     
     <br>
 
+    <label for="congeExceptionnel">Congé exceptionnel ?</label>
+    <input type="checkbox" id="congeExceptionnel" name="congeExceptionnel">
+ 
     
+    <div id="congeExceptionnelInputs" style="display: none;">
+        <label for="pieceJointe">Pièce jointe</label>
+        <input type="file" id="actual-btn" hidden/>
+
+<!-- our custom upload button -->
+<label name="upload" for="actual-btn"> + Attacher piece jointe</label>
+
+<!-- name of file chosen -->
+<span id="file-chosen">Aucun fichier attache</span>
+
+<br>
+    <br>
+
+    <br>
+    <br>
+        
+        <label for="remarque">Remarque</label>
+        <textarea name="remarque" id="remarque"></textarea>
+    </div>
+    <br>
+    <br>
+    <br>
+    <br>
     <?php if (isset($error)): ?>
     <p class="error"><?= $error ?></p>
     <?php endif; ?>
@@ -151,7 +174,7 @@ $result = $query->get_result();
                 <td><?= htmlspecialchars($row['statut']) ?></td>
                 <td><?= htmlspecialchars($row['justificatif']) ?></td>
                 <td>
-                    <?php if ($row['statut'] === 'En Attente'): ?>
+                    <?php if ($row['statut'] === 'En attente'): ?>
                         <a href="modifier_conge.php?id=<?= $row['id'] ?>"><i class="fas fa-edit edit-icon"></i></a> | 
                         <a class="deleteButton" data-id="<?= $row['id'] ?>"><i class="fas fa-trash-alt delete-icon"></i></a>
                     <?php endif; ?>
@@ -225,3 +248,4 @@ actualBtn.addEventListener('change', function(){
 <?php
 $conn->close();
 ?>
+

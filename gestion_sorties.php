@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $justificatif = $_POST['justificatif'] ?? '';
 
     if ($dateSortie >= $dateToday) {
-        $stmt = $conn->prepare("INSERT INTO sortie (matricule, date_sortie, heure_sortie, motif, statut) VALUES (?, ?, ?, ?, 'En attente')");
+        $stmt = $conn->prepare("INSERT INTO sortie (matricule, date_sortie, heure_sortie, motif,dec_rh, dec_pdg, statut) VALUES (?, ?, ?, ?,2,2, 'En Attente')");
         $stmt->bind_param("ssss", $matricule, $dateSortie, $heureSortie, $justificatif);
         $stmt->execute();
         $stmt->close();
@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 // Récupérer les sorties de l'utilisateur connecté
-$query = $conn->prepare("SELECT id, date_sortie ,heure_sortie, motif, statut FROM sortie WHERE matricule = ? ORDER BY CASE WHEN statut = 'En attente' THEN 1 WHEN statut = 'Accepté' THEN 2 ELSE 3 END");
+$query = $conn->prepare("SELECT id, date_sortie ,heure_sortie, motif, statut FROM sortie WHERE matricule = ? ORDER BY CASE WHEN statut = 'En Attente' THEN 1 WHEN statut = 'Accepté' THEN 2 ELSE 3 END");
 
 
 $query->bind_param("s", $matricule);
@@ -124,8 +124,8 @@ $result = $query->get_result();
                 <td><?= htmlspecialchars($row['motif']) ?></td>
                 <td><?= htmlspecialchars($row['statut']) ?></td>
                 <td>
-                    <?php if ($row['statut'] === 'En attente'): ?>
-                        <a href="modifier_conge.php?id=<?= $row['id'] ?>"><i class="fas fa-edit edit-icon"></i></a> | 
+                    <?php if ($row['statut'] === 'En Attente'): ?>
+                        <a href="modifier_sortie.php?id=<?= $row['id'] ?>"><i class="fas fa-edit edit-icon"></i></a> | 
                         <a class="deleteButton" data-id="<?= $row['id'] ?>"><i class="fas fa-trash-alt delete-icon"></i></a>
                     <?php endif; ?>
                 </td>

@@ -1,0 +1,160 @@
+body {
+    font-family: Consolas, monospace;
+}
+.navbar {
+    overflow: hidden;
+    background-color: #148d04;
+    display: flex;
+    align-items: center;
+    color: white;
+    font-family: Consolas, monospace;
+    margin: 10px;
+    border-radius: 15px;
+    padding: 5px;
+}
+
+/* Les liens de la barre de navigation */
+.navbar a {
+    display: block;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    color: inherit; /* Utilise la couleur de texte par défaut pour les liens */
+    font-size: 16px;
+    transition: background-color 0.3s, color 0.3s, border-radius 0.3s; /* Ajout de la transition pour le survol */
+    border-radius: 10px; /* Bordure courbée par défaut */
+}
+
+/* Changement de couleur des liens au survol */
+.navbar a:hover {
+        background-color: #fff;
+        color: #148d04;
+        border-radius: 10px; /* Bordure courbée au survol */
+    }
+
+    /* Style pour l'image dans le lien */
+    .navbar .logo {
+        margin-right: 10px;
+        margin-left: 5px; /* Espace entre le logo et le premier lien */
+    }
+
+    .navbar .logo img {
+        height: 30px; /* Taille légèrement agrandie du logo */
+        vertical-align: middle; /* pour aligner l'image verticalement avec le texte s'il y en a */
+    }
+
+.user-info {
+    margin-left: auto; /* met le nom de l'utilisateur à droite */
+    padding: 14px 16px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.logout-button {
+    margin-left: 10px;
+    padding: 8px 12px;
+    background-color: #ddd;
+    border: none;
+    color: #333;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s, border-radius 0.3s; /* Ajout de la transition pour le survol */
+    border-radius: 10px; /* Bordure courbée par défaut */
+}
+
+.logout-button:hover {
+    background-color: #aaa;
+    color: white;
+    border-radius: 10px; /* Bordure courbée au survol */
+}
+
+/* Style pour le formulaire de filtrage */
+.filter-form {
+    margin-bottom: 20px;
+}
+
+/* Style pour le champ de saisie */
+.filter-input {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-right: 10px;
+    margin-left: 30px;
+}
+
+/* Style pour le bouton de soumission */
+.filter-button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    background-color: #148d04;
+    color: white;
+    cursor: pointer;
+}
+
+/* Style pour le bouton de réinitialisation */
+.reset-button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ccc;
+    color: #333;
+    cursor: pointer;
+}
+
+/* Style pour la table */
+table {
+width: calc(100% - 60px); /* 100% width minus 30px left and 30px right margins */
+margin-left: 30px;
+margin-right: 30px;
+border-collapse: separate; /* Separate border model for curved borders */
+border-spacing: 0; /* No spacing between table cells */
+border: 1px solid #ddd; /* Light border color */
+border-radius: 10px; /* Curved border radius */
+}
+
+
+th, td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+h1 {
+    text-align: center;
+}
+button[value="accepter"] {
+color: #fff;
+margin-right: 5px;
+background-color: #4CAF50;
+padding: 10px 20px;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+font-size: 16px;
+transition: background-color 0.3s;
+}
+
+button[value="accepter"]:hover {
+background-color: #45a049;
+}
+
+button[value="refuser"] {
+color: #fff;
+margin-right: 5px;
+background-color: #dd3939;
+padding: 10px 20px;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+font-size: 16px;
+transition: background-color 0.3s;
+}
+
+button[value="refuser"]:hover {
+background-color: #e41d1d;
+}

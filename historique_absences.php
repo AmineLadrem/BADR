@@ -182,7 +182,7 @@ a:hover {
     <form class="filter-form" action="" method="GET">
     <input class="filter-input" type="text" name="matricule" placeholder="Matricule...">
     <button class="filter-button" type="submit">Filtrer</button>
-    <button class="reset-button" type="reset">Réinitialiser</button>
+    <button class="reset-button" type="button" onclick="resetFilter()">Réinitialiser</button>
 </form>
     <table>
         <thead>
@@ -208,15 +208,21 @@ a:hover {
     $filter_matricule = isset($_GET['matricule']) ? $_GET['matricule'] : '';
 
     // Construction de la requête SQL en fonction du filtrage par matricule
-    $sql = "SELECT a.id,a.date_debut,a.date_fin,a.motif,a.statut ,u.matricule, u.nom, u.prenom	,u.email  FROM absence a , utilisateurs u 
-    where u.matricule=a.matricule ORDER BY CASE 
-        WHEN a.statut = 'En attente' THEN 1 
-        WHEN a.statut = 'Accepté' THEN 2 
-        ELSE 3 
-    END";
-    if (!empty($filter_matricule)) {
-        $sql .= " and u.matricule LIKE '%$filter_matricule%'";
-    }
+  // Construction de la requête SQL en fonction du filtrage par matricule
+$sql = "SELECT a.id, a.date_debut, a.date_fin, a.motif, a.statut, u.matricule, u.nom, u.prenom, u.email  
+FROM absence a 
+JOIN utilisateurs u ON u.matricule = a.matricule";
+
+if (!empty($filter_matricule)) {
+$sql .= " WHERE a.matricule LIKE '%$filter_matricule%'";
+}
+
+$sql .= " ORDER BY CASE 
+    WHEN a.statut = 'En attente' THEN 1 
+    WHEN a.statut = 'Accepté' THEN 2 
+    ELSE 3 
+  END";
+
 
     // Exécution de la requête SQL
     $result = $conn->query($sql);
@@ -241,6 +247,11 @@ a:hover {
     </table>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 <script>
+     function resetFilter() {
+        document.querySelector('.filter-input').value = '';
+        // Remove the matricule parameter from the URL and resubmit the form
+        window.location.href = window.location.pathname;
+    }
     // Function to get the value of a cookie by its name
     function getCookie(cookieName) {
         const name = cookieName + "=";

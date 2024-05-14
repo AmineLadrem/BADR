@@ -38,6 +38,7 @@ form button[type="submit"] {
     background-color: #148d04;
     color: white;
     border: none;
+    font-weight: bold;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;

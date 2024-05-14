@@ -8,6 +8,62 @@ if (!isset($_SESSION['email']) || $_SESSION['est_superieur_hierarchique'] != 1) 
     exit;
 }
 
+function updateDecision($conn, $id, $decision, $dec_rh) {
+    $dec_pdg_value = $decision == 'accepter' ? 1 : 0;
+    $sql = "UPDATE sortie SET dec_pdg = '$dec_pdg_value'";
+
+    // Update statut based on dec_rh and dec_pdg values
+    switch ($dec_rh) {
+        case 0:
+            $statut = 'Refuse';
+            break;
+        case 1:
+            $statut = $decision == 'accepter' ? 'Accepte' : 'Refuse';
+            break;
+        case 2:
+            $statut = $decision == 'accepter' ? 'En Attente' : 'Refuse';
+            break;
+    }
+
+    $sql .= ", statut = '$statut'"; // Properly append statut update with a comma
+
+    // Complete the SQL query with the WHERE clause
+    $sql .= " WHERE id = '$id'";
+
+    // Debug output
+   // echo "SQL Query: $sql<br>";
+
+    if ($conn->query($sql) === TRUE) {
+        return true;
+    } else {
+       // echo "Error updating record: " . $conn->error; // Display any errors
+        return false;
+    }
+}
+
+
+
+
+ 
+// Check if the form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $id = $_POST['id'];
+    $decision = isset($_POST['accepter']) ? 'accepter' : (isset($_POST['refuser']) ? 'refuser' : '');
+    $dec_rh = $_POST['dec_rh'];
+    
+    // Debug output
+   // echo "ID: $id, Decision: $decision, Dec_rh: $dec_rh<br>";
+    
+    // Update the decision and statut in the database
+    if (!empty($decision)) {
+        if (updateDecision($conn, $id, $decision, $dec_rh)) {
+           // echo "Decision updated successfully";
+        } else {
+          //  echo "Error updating decision";
+        }
+    }
+}
+
 // Récupérer l'historique des congés depuis la base de données
 $sql = "SELECT * FROM sortie ORDER BY CASE WHEN statut = 'En attente' THEN 1 WHEN statut = 'Accepté' THEN 2 ELSE 3 END";
 $result = $conn->query($sql);
@@ -20,168 +76,7 @@ $result = $conn->query($sql);
     <title>Historique des sorties</title>
     <!-- Include Font Awesome CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <style> 
-    body {
-        font-family: Consolas, monospace;
-    }
-    .navbar {
-        overflow: hidden;
-        background-color: #148d04;
-        display: flex;
-        align-items: center;
-        color: white;
-        font-family: Consolas, monospace;
-        margin: 10px;
-        border-radius: 15px;
-        padding: 5px;
-    }
-
-    /* Les liens de la barre de navigation */
-    .navbar a {
-        display: block;
-        text-align: center;
-        padding: 14px 16px;
-        text-decoration: none;
-        color: inherit; /* Utilise la couleur de texte par défaut pour les liens */
-        font-size: 16px;
-        transition: background-color 0.3s, color 0.3s, border-radius 0.3s; /* Ajout de la transition pour le survol */
-        border-radius: 10px; /* Bordure courbée par défaut */
-    }
-
-    /* Changement de couleur des liens au survol */
-    .navbar a:hover {
-            background-color: #fff;
-            color: #148d04;
-            border-radius: 10px; /* Bordure courbée au survol */
-        }
-
-        /* Style pour l'image dans le lien */
-        .navbar .logo {
-            margin-right: 10px;
-            margin-left: 5px; /* Espace entre le logo et le premier lien */
-        }
-
-        .navbar .logo img {
-            height: 30px; /* Taille légèrement agrandie du logo */
-            vertical-align: middle; /* pour aligner l'image verticalement avec le texte s'il y en a */
-        }
-
-    .user-info {
-        margin-left: auto; /* met le nom de l'utilisateur à droite */
-        padding: 14px 16px;
-        font-size: 16px;
-        display: flex;
-        align-items: center;
-    }
-
-    .logout-button {
-        margin-left: 10px;
-        padding: 8px 12px;
-        background-color: #ddd;
-        border: none;
-        color: #333;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s, color 0.3s, border-radius 0.3s; /* Ajout de la transition pour le survol */
-        border-radius: 10px; /* Bordure courbée par défaut */
-    }
-
-    .logout-button:hover {
-        background-color: #aaa;
-        color: white;
-        border-radius: 10px; /* Bordure courbée au survol */
-    }
-
-    /* Style pour le formulaire de filtrage */
-    .filter-form {
-        margin-bottom: 20px;
-    }
-
-    /* Style pour le champ de saisie */
-    .filter-input {
-        padding: 8px;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-        margin-right: 10px;
-        margin-left: 30px;
-    }
-
-    /* Style pour le bouton de soumission */
-    .filter-button {
-        padding: 8px 12px;
-        border: none;
-        border-radius: 5px;
-        background-color: #148d04;
-        color: white;
-        cursor: pointer;
-    }
-
-    /* Style pour le bouton de réinitialisation */
-    .reset-button {
-        padding: 8px 12px;
-        border: none;
-        border-radius: 5px;
-        background-color: #ccc;
-        color: #333;
-        cursor: pointer;
-    }
-
-    /* Style pour la table */
-    table {
-    width: calc(100% - 60px); /* 100% width minus 30px left and 30px right margins */
-    margin-left: 30px;
-    margin-right: 30px;
-    border-collapse: separate; /* Separate border model for curved borders */
-    border-spacing: 0; /* No spacing between table cells */
-    border: 1px solid #ddd; /* Light border color */
-    border-radius: 10px; /* Curved border radius */
-}
-
-
-    th, td {
-        padding: 8px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-    }
-
-    th {
-        background-color: #f2f2f2;
-    }
-    h1 {
-        text-align: center;
-    }
-    button[value="accepter"] {
-    color: #fff;
-    margin-right: 5px;
-    background-color: #4CAF50;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
-}
-
-button[value="accepter"]:hover {
-    background-color: #45a049;
-}
-
-button[value="refuser"] {
-    color: #fff;
-    margin-right: 5px;
-    background-color: #dd3939;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
-}
-
-button[value="refuser"]:hover {
-    background-color: #e41d1d;
-}
-    </style>
+    <link rel="stylesheet" href="styles/historique_sorties.css">
 </head>
 
 <body>
@@ -201,11 +96,13 @@ button[value="refuser"]:hover {
 <h1>Historique des Sorties</h1>
 
 <!-- Formulaire de filtrage -->
-<form class="filter-form" action="" method="GET">
+<!-- Formulaire de filtrage -->
+<form class="filter-form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="GET">
     <input class="filter-input" type="text" name="matricule" placeholder="Matricule...">
     <button class="filter-button" type="submit">Filtrer</button>
-    <button class="reset-button" type="reset">Réinitialiser</button>
+    <button class="reset-button" type="button" onclick="resetFilter()">Réinitialiser</button>
 </form>
+
 
 <table>
     <thead>
@@ -228,18 +125,21 @@ button[value="refuser"]:hover {
     $filter_matricule = isset($_GET['matricule']) ? $_GET['matricule'] : '';
 
     // Construction de la requête SQL en fonction du filtrage par matricule
-    $sql = "SELECT u.matricule, u.nom, u.prenom, s.date_sortie, s.heure_sortie, s.motif, s.statut, s.dec_pdg, s.dec_rh
-    FROM sortie s, utilisateurs u 
-    WHERE s.matricule = u.matricule
-    ORDER BY CASE 
-        WHEN s.statut = 'En attente' THEN 1 
-        WHEN s.statut = 'Accepté' THEN 2 
-        ELSE 3 
-    END";
+    // Construction de la requête SQL en fonction du filtrage par matricule
+$sql = "SELECT u.matricule, u.nom, u.prenom, s.date_sortie, s.heure_sortie, s.motif, s.statut, s.dec_pdg, s.dec_rh , s.id
+FROM sortie s
+INNER JOIN utilisateurs u ON s.matricule = u.matricule";
 
-    if (!empty($filter_matricule)) {
-        $sql .= " and u.matricule LIKE '%$filter_matricule%'";
-    }
+if (!empty($filter_matricule)) {
+$sql .= " WHERE u.matricule LIKE '%$filter_matricule%'";
+}
+
+$sql .= " ORDER BY CASE 
+    WHEN s.statut = 'En attente' THEN 1 
+    WHEN s.statut = 'Accepté' THEN 2 
+    ELSE 3 
+END";
+
 
     // Exécution de la requête SQL
     $result = $conn->query($sql);
@@ -256,15 +156,16 @@ button[value="refuser"]:hover {
             <td><?= $row["dec_rh"] == 1 ? 'Acceptée' : ($row["dec_rh"] == 2 ? 'En attente' : 'Refusée') ?></td> <!-- Display decision de RH -->
             <td><?= $row["statut"] ?></td>
             <td>
-                <?php if ($row["statut"] == "En attente"): ?>
-                    <?php if ($row["dec_rh"] == 0 || $row["dec_pdg"] == 0): ?>
-                        <!-- Display nothing if either RH or PDG has not made a decision -->
-                    <?php elseif ($row["dec_rh"] == 1 && $row["dec_pdg"] == 1): ?>
-                        <!-- Display buttons if both RH and PDG have made decisions -->
-                        <button value="accepter">Accepter</button>
-                        <button value="refuser">Refuser</button>
-                    <?php endif; ?>
-                <?php endif; ?>
+            <?php if ($row["statut"] == "En attente" && ($row["dec_rh"] == 2 || $row["dec_rh"] == 1) && $row["dec_pdg"] == 2): ?>
+    <!-- Display buttons if both RH and PDG have made decisions -->
+      <form method="post" action="historique_sorties.php">
+        <input type="hidden" name="id" value="<?= $row['id'] ?>">
+        <input type="hidden" name="dec_rh" value="<?= $row['dec_rh'] ?>">
+        <button type="submit" name="accepter" value="accepter">Accepter</button>
+        <button type="submit" name="refuser" value="refuser">Refuser</button>
+    </form>
+<?php endif; ?>
+
             </td>
         </tr>
     <?php endwhile; ?>
@@ -274,6 +175,11 @@ button[value="refuser"]:hover {
 
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 <script>
+      function resetFilter() {
+        document.querySelector('.filter-input').value = '';
+        // Remove the matricule parameter from the URL and resubmit the form
+        window.location.href = window.location.pathname;
+    }
     // Function to get the value of a cookie by its name
     function getCookie(cookieName) {
         const name = cookieName + "=";

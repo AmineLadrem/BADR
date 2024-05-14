@@ -28,6 +28,7 @@ form label {
 }
 
 form input[type="date"],
+form input[type="time"],
 form textarea {
     padding: 10px;
     margin-bottom: 10px;

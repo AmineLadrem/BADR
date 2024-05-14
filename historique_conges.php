@@ -8,6 +8,63 @@ if (!isset($_SESSION['email']) || $_SESSION['est_superieur_hierarchique'] != 1) 
     exit;
 }
 
+
+function updateDecision($conn, $id, $decision, $dec_rh) {
+    $dec_pdg_value = $decision == 'accepter' ? 1 : 0;
+    $sql = "UPDATE conge SET dec_pdg = '$dec_pdg_value'";
+
+    // Update statut based on dec_rh and dec_pdg values
+    switch ($dec_rh) {
+        case 0:
+            $statut = 'Refuse';
+            break;
+        case 1:
+            $statut = $decision == 'accepter' ? 'Accepte' : 'Refuse';
+            break;
+        case 2:
+            $statut = $decision == 'accepter' ? 'En Attente' : 'Refuse';
+            break;
+    }
+
+    $sql .= ", statut = '$statut'"; // Properly append statut update with a comma
+
+    // Complete the SQL query with the WHERE clause
+    $sql .= " WHERE id = '$id'";
+
+    // Debug output
+   // echo "SQL Query: $sql<br>";
+
+    if ($conn->query($sql) === TRUE) {
+        return true;
+    } else {
+       // echo "Error updating record: " . $conn->error; // Display any errors
+        return false;
+    }
+}
+
+
+
+
+ 
+// Check if the form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $id = $_POST['id'];
+    $decision = isset($_POST['accepter']) ? 'accepter' : (isset($_POST['refuser']) ? 'refuser' : '');
+    $dec_rh = $_POST['dec_rh'];
+    
+    // Debug output
+   // echo "ID: $id, Decision: $decision, Dec_rh: $dec_rh<br>";
+    
+    // Update the decision and statut in the database
+    if (!empty($decision)) {
+        if (updateDecision($conn, $id, $decision, $dec_rh)) {
+           // echo "Decision updated successfully";
+        } else {
+          //  echo "Error updating decision";
+        }
+    }
+}
+
 // Récupérer l'historique des congés depuis la base de données
 $sql = "SELECT * FROM conge";
 $result = $conn->query($sql);
@@ -199,11 +256,14 @@ button[value="refuser"]:hover {
 <h1>Historique des Congés</h1>
 
 <!-- Formulaire de filtrage -->
-<form class="filter-form" action="" method="GET">
+<!-- Formulaire de filtrage -->
+<form class="filter-form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="GET">
     <input class="filter-input" type="text" name="matricule" placeholder="Matricule...">
     <button class="filter-button" type="submit">Filtrer</button>
-    <button class="reset-button" type="reset">Réinitialiser</button>
+    <button class="reset-button" type="button" onclick="resetFilter()">Réinitialiser</button>
+
 </form>
+
 
 <table>
     <thead>
@@ -214,6 +274,7 @@ button[value="refuser"]:hover {
             <th>Date de Début</th>
             <th>Date de Fin</th>
             <th>Justificatif</th>
+            <th>Décision de RH</th>
             <th>Statut</th>
             <th>Actions</th> <!-- New column for actions -->
            
@@ -225,16 +286,21 @@ button[value="refuser"]:hover {
     $filter_matricule = isset($_GET['matricule']) ? $_GET['matricule'] : '';
 
     // Construction de la requête SQL en fonction du filtrage par matricule
-    $sql = "SELECT u.matricule, u.nom, u.prenom, dc.dateDebut, dc.dateFin, dc.justificatif, dc.statut, u.email 
-            FROM conge dc  , utilisateurs u 
-           where dc.matricule = u.matricule   ORDER BY CASE 
-        WHEN dc.statut = 'En attente' THEN 1 
-        WHEN dc.statut = 'Accepté' THEN 2 
-        ELSE 3 
-    END";
-    if (!empty($filter_matricule)) {
-        $sql .= " and u.matricule LIKE '%$filter_matricule%'";
-    }
+  // Construction de la requête SQL en fonction du filtrage par matricule
+$sql = "SELECT u.matricule, u.nom, u.prenom, dc.dateDebut, dc.dateFin, dc.justificatif, dc.statut, u.email, dc.dec_rh, dc.dec_pdg, dc.id
+FROM conge dc
+INNER JOIN utilisateurs u ON dc.matricule = u.matricule";
+
+if (!empty($filter_matricule)) {
+$sql .= " WHERE u.matricule LIKE '%$filter_matricule%'";
+}
+
+$sql .= " ORDER BY CASE 
+    WHEN dc.statut = 'En attente' THEN 1 
+    WHEN dc.statut = 'Accepté' THEN 2 
+    ELSE 3 
+END";
+
 
     // Exécution de la requête SQL
     $result = $conn->query($sql);
@@ -248,13 +314,20 @@ button[value="refuser"]:hover {
             <td><?= $row["dateDebut"] ?></td>
             <td><?= $row["dateFin"] ?></td>
             <td><?= $row["justificatif"] ?></td>
+            <td><?= $row["dec_rh"] == 1 ? 'Acceptée' : ($row["dec_rh"] == 2 ? 'En attente' : 'Refusée') ?></td> <!-- Display decision de RH -->
             <td><?= $row["statut"] ?></td>
             <td>
-                        <?php if ($row["statut"] == "En attente"): ?>
-                            <button value="accepter">Accepter</button>
-                            <button value="refuser">Refuser</button>
-                        <?php endif; ?>
-                    </td>
+                
+            <?php  if ($row["statut"] == "En Attente" && ($row["dec_rh"] == 2 || $row["dec_rh"] == 1) && $row["dec_pdg"] == 2): ?>
+      <form method="post" action="historique_conges.php">
+        <input type="hidden" name="id" value="<?= $row['id'] ?>">
+        <input type="hidden" name="dec_rh" value="<?= $row['dec_rh'] ?>">
+        <button type="submit" name="accepter" value="accepter">Accepter</button>
+        <button type="submit" name="refuser" value="refuser">Refuser</button>
+    </form>
+<?php endif; ?>
+
+            </td>
         </tr>
     <?php endwhile; ?>
 
@@ -263,6 +336,11 @@ button[value="refuser"]:hover {
 
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 <script>
+     function resetFilter() {
+        document.querySelector('.filter-input').value = '';
+        // Remove the matricule parameter from the URL and resubmit the form
+        window.location.href = window.location.pathname;
+    }
     // Function to get the value of a cookie by its name
     function getCookie(cookieName) {
         const name = cookieName + "=";

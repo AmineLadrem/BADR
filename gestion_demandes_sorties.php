@@ -7,8 +7,27 @@ if (!isset($_SESSION['email']) || $_SESSION['is_supervisor'] != 1) {
     exit;
 }
 
+$filter_matricule = isset($_GET['matricule']) ? $_GET['matricule'] : '';
+
+    // Construction de la requête SQL en fonction du filtrage par matricule
+  // Construction de la requête SQL en fonction du filtrage par matricule
+$sql = "SELECT u.matricule, u.nom, u.prenom, s.date_sortie, s.heure_sortie, s.motif, s.statut, u.email, s.dec_rh, s.dec_pdg, s.id
+FROM sortie s
+INNER JOIN utilisateurs u ON s.matricule = u.matricule";
+
+if (!empty($filter_matricule)) {
+$sql .= " WHERE u.matricule LIKE '%$filter_matricule%'";
+}
+
+$sql .= " ORDER BY CASE 
+    WHEN s.statut = 'En attente' THEN 1 
+    WHEN s.statut = 'Accepté' THEN 2 
+    ELSE 3 
+END";
+
 // Execute SQL query to get pending absences
-$stmt = $conn->prepare("SELECT id, matricule, date_sortie, heure_sortie, motif, statut FROM sortie");
+$stmt = $conn->prepare($sql);
+
 $stmt->execute();
 $result = $stmt->get_result();
 ?>
@@ -38,12 +57,20 @@ $result = $stmt->get_result();
     </div>
     <div class="container">
         <h1>Liste des Demandes de Sorties</h1>
+        <form class="filter-form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="GET">
+    <input class="filter-input" type="text" name="matricule" placeholder="Matricule...">
+    <button class="filter-button" type="submit">Filtrer</button>
+    <button class="reset-button" type="button" onclick="resetFilter()">Réinitialiser</button>
+
+</form>
 
         <?php if ($result->num_rows > 0): ?>
         <table>
             <thead>
                 <tr>
-                    <th>Email Utilisateur</th>
+                    <th>Matricule</th>
+                    <th>Nom</th>
+                    <th>Prenom</th>
                     <th>Date Sortie</th>
                     <th>Heure Sortie</th>
                     <th>Motif</th>
@@ -54,6 +81,8 @@ $result = $stmt->get_result();
                 <?php while($row = $result->fetch_assoc()): ?>
                     <tr>
                         <td><?= isset($row["matricule"]) ? $row["matricule"] : "Non défini" ?></td>
+                        <td><?= isset($row["nom"]) ? $row["nom"] : "Non défini" ?></td>
+                        <td><?= isset($row["prenom"]) ? $row["prenom"] : "Non défini" ?></td>
                         <td><?= isset($row["date_sortie"]) ? $row["date_sortie"] : "Non défini" ?></td>
                         <td><?= isset($row["heure_sortie"]) ? $row["heure_sortie"] : "Non défini" ?></td>
                         <td><?= isset($row["motif"]) ? $row["motif"] : "Non défini" ?></td>
@@ -74,5 +103,12 @@ $result = $stmt->get_result();
     </div>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script src="get_name.js"></script>
+    <script>
+         function resetFilter() {
+        document.querySelector('.filter-input').value = '';
+        // Remove the matricule parameter from the URL and resubmit the form
+        window.location.href = window.location.pathname;
+    }
+    </script>
 </body>
 </html>

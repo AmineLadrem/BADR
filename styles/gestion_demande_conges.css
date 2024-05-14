@@ -55,6 +55,56 @@ input[type="textarea"]  {
     box-sizing: border-box;
 }
 
+.filter-form {
+    margin-bottom: 20px;
+    margin-left: 30px;
+}
+
+/* Style pour le champ de saisie */
+.filter-input {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-right: 10px;
+}
+
+.button-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.button-container > button {
+    color: #fff;
+    background-color: #4CAF50;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+
+/* Style pour le bouton de soumission */
+.filter-button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    background-color: #148d04;
+    color: white;
+    cursor: pointer;
+}
+
+/* Style pour le bouton de réinitialisation */
+.reset-button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ccc;
+    color: #333;
+    cursor: pointer;
+}
+
 h1 {
     text-align: center;
     margin-bottom: 30px;
@@ -87,4 +137,110 @@ table tr {
 
 table tr:hover {
     background-color: #f2f2f2;
+}
+
+
+.left-panel {
+    width: 100%;
+    margin-right: 2%;
+    /* Add a small gap between the panels */
+    height: 80vh; /* Set a fixed height for the left panel */
+    margin: auto; /* Center the left panel horizontally */
+}
+
+
+.right-panel {
+    width: 70%;
+    margin-left: 2%;
+    display: none;
+    /* Add a small gap between the panels */
+    margin: auto; /* Center the right panel horizontally */
+}
+
+
+form {
+    margin-bottom: 20px;
+}
+
+form label {
+    display: block; /* Display labels as block elements */
+    margin-bottom: 5px; /* Add some space between labels and inputs */
+    font-weight: bolder;
+    font-size: large;
+}
+
+form input[type="date"],
+form input[type="time"] {
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 65%;
+    box-sizing: border-box;
+}
+
+ 
+form textarea {
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 90%;
+    box-sizing: border-box;
+}
+
+
+form button[type="submit"] {
+    padding: 10px 20px;
+    background-color: #148d04;
+    font-weight: bold;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+form button[type="submit"]:hover {
+    background-color: #0e6b03;
+}
+
+
+label[name="upload"] {
+    background-color: #148d04;
+    color: white;
+    padding: 0.5rem;
+    font-family: sans-serif;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    width:195px;
+    margin-top: 1rem;
+  }
+  
+/* Checkbox Styling */
+input[type="checkbox"] {
+    appearance: none; /* Remove default appearance */
+    -webkit-appearance: none; /* Remove default appearance for Safari */
+    -moz-appearance: none; /* Remove default appearance for Firefox */
+    width: 20px; /* Set custom width */
+    height: 20px; /* Set custom height */
+    border: 2px solid #ccc; /* Add border */
+    border-radius: 3px; /* Add border radius */
+    cursor: pointer; /* Add pointer cursor */
+    outline: none; /* Remove default focus outline */
+    transition: background-color 0.3s, border-color 0.3s; /* Add transition effect */
+}
+
+input[type="checkbox"]:checked {
+    background-color: #148d04; /* Change background color when checked */
+    border-color: #148d04; /* Change border color when checked */
+}
+
+/* Custom checkbox tick */
+input[type="checkbox"]:checked::before {
+    content: "\2713"; /* Unicode character for checkmark */
+    display: block;
+    color: white; /* Set checkmark color */
+    text-align: center; /* Center the checkmark */
+    line-height: 20px; /* Match the height of the checkbox */
 }
