@@ -44,7 +44,7 @@ $getUser->bind_param("i", $info['matricule']);
                 $status = 'Refusé';
                 $dec_rh=0;
 
-                // Restituer les jours si la demande est refusée
+     
                 $updateDays = $conn->prepare("UPDATE utilisateurs SET joursCongesRestants = joursCongesRestants + ? WHERE matricule = ?");
                 $updateDays->bind_param("is", $daysRequested, $ininfoUserfo['matricule']);
                 $updateDays->execute();
@@ -53,7 +53,7 @@ $getUser->bind_param("i", $info['matricule']);
 
             $sql = "UPDATE conge SET dec_rh = '$dec_rh'";
 
-    // Update statut based on dec_rh and dec_pdg values
+   
     switch ($info['dec_pdg']) {
         case 0:
             $statut = 'Refusé';
@@ -66,36 +66,35 @@ $getUser->bind_param("i", $info['matricule']);
             break;
     }
 
-    $sql .= ", statut = '$statut'"; // Properly append statut update with a comma
+    $sql .= ", statut = '$statut'"; 
 
-    // Complete the SQL query with the WHERE clause
+    
     $sql .= " WHERE id = '$demandeId'";
 
 
 
 
-            // Mettre à jour le statut de la demande
             $stmt = $conn->prepare($sql);
             $stmt->execute();
             $stmt->close();
         } else {
-            // Gérer le cas où les dates sont nulles
+         
             echo "Les dates de la demande sont nulles.";
         }
     } else {
-        // Gérer le cas où aucune demande correspondante n'est trouvée
+       
         echo "Aucune demande de congé correspondante trouvée.";
     }
 }
 elseif (isset($_POST['formType']) && $_POST['formType'] === 'form2') {
-    // Gather form data
+ 
     $matricule_user = $_POST['matricule'];
     $dateDebut = $_POST['dateDebut'];
     $dateFin = $_POST['dateFin'];
     $justificatif = $_POST['justificatif'] ?? '';
     $remarque = $_POST['remarque'] ?? '';
     
-    // Check if the checkbox is checked
+ 
     $congeExceptionnel = isset($_POST['congeExceptionnel']) ? 1 : 0;
 
     $debut = new DateTime($dateDebut);
@@ -141,10 +140,10 @@ elseif (isset($_POST['formType']) && $_POST['formType'] === 'form2') {
         $insertConge->bind_param("isss", $matricule_user, $dateDebut, $dateFin, $justificatif);
 
         if ($insertConge->execute()) {
-            // Check if the checkbox is checked before accessing it
+           
             if ($congeExceptionnel == 1) {
                 $excep = $remarque;
-                // Insert data into 'conge_excep' table
+                
                 $insertCongeExcep = $conn->prepare("INSERT INTO conge_excep (matricule, excep, id_cong) VALUES (?, ?, LAST_INSERT_ID())");
                 $insertCongeExcep->bind_param("is", $matricule_user, $excep);
                 $insertCongeExcep->execute();
@@ -274,10 +273,10 @@ $result = $conn->query("SELECT * FROM conge WHERE dec_rh = 2 and (dec_pdg=2 OR d
         <label for="pieceJointe">Pièce jointe</label>
         <input type="file" id="actual-btn" hidden/>
 
-<!-- our custom upload button -->
+
 <label name="upload" for="actual-btn"> + Attacher piece jointe</label>
 
-<!-- name of file chosen -->
+
 <span id="file-chosen">Aucun fichier attache</span>
 
 <br>

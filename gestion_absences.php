@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// Récupérer les absences de l'utilisateur connecté
+
 $query = $conn->prepare("SELECT id, date_debut, date_fin, motif, statut FROM absence WHERE matricule = ? ORDER BY CASE WHEN statut = 'En Attente' THEN 1 WHEN statut = 'Accepté' THEN 2 ELSE 3 END");
 
 
@@ -146,12 +146,12 @@ $result = $query->get_result();
                 xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                 xhr.onload = function() {
                     if (xhr.status === 200) {
-                        // Deletion successful
+                     
                         alert("La demande d'absence a été supprimée avec succès.");
-                        // Redirect to gestion_conges.php
+                        
                         window.location.href = 'gestion_absences.php';
                     } else {
-                        // Failed to delete
+                        
                         alert("Erreur lors de la suppression de la demande d'absence. Veuillez réessayer.");
                     }
                 };

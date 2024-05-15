@@ -282,11 +282,10 @@ button[value="refuser"]:hover {
     </thead>
     <tbody>
     <?php
-    // Récupérer les valeurs filtrées si elles existent
+    
     $filter_matricule = isset($_GET['matricule']) ? $_GET['matricule'] : '';
 
-    // Construction de la requête SQL en fonction du filtrage par matricule
-  // Construction de la requête SQL en fonction du filtrage par matricule
+
 $sql = "SELECT u.matricule, u.nom, u.prenom, dc.dateDebut, dc.dateFin, dc.justificatif, dc.statut, u.email, dc.dec_rh, dc.dec_pdg, dc.id
 FROM conge dc
 INNER JOIN utilisateurs u ON dc.matricule = u.matricule";
@@ -302,10 +301,10 @@ $sql .= " ORDER BY CASE
 END";
 
 
-    // Exécution de la requête SQL
+
     $result = $conn->query($sql);
 
-    // Affichage des résultats
+
     while ($row = $result->fetch_assoc()): ?>
         <tr>
             <td><?= $row["matricule"] ?></td>
@@ -314,7 +313,7 @@ END";
             <td><?= $row["dateDebut"] ?></td>
             <td><?= $row["dateFin"] ?></td>
             <td><?= $row["justificatif"] ?></td>
-            <td><?= $row["dec_rh"] == 1 ? 'Acceptée' : ($row["dec_rh"] == 2 ? 'En attente' : 'Refusée') ?></td> <!-- Display decision de RH -->
+            <td><?= $row["dec_rh"] == 1 ? 'Acceptée' : ($row["dec_rh"] == 2 ? 'En attente' : 'Refusée') ?></td> 
             <td><?= $row["statut"] ?></td>
             <td>
                 
@@ -338,10 +337,9 @@ END";
 <script>
      function resetFilter() {
         document.querySelector('.filter-input').value = '';
-        // Remove the matricule parameter from the URL and resubmit the form
         window.location.href = window.location.pathname;
     }
-    // Function to get the value of a cookie by its name
+ 
     function getCookie(cookieName) {
         const name = cookieName + "=";
         const decodedCookie = decodeURIComponent(document.cookie);
@@ -358,20 +356,20 @@ END";
         return "";
     }
 
-    // Get the value of the 'nom' cookie
+
     const userName = getCookie('nom');
 
-    // Display the user's name if it exists
+  
     if (userName) {
         document.getElementById('userWelcome').innerText = "Bienvenue, " + userName;
     }
 
     // Logout function
     function logout() {
-        // Clear the 'nom' cookie
+       
         document.cookie = "nom=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        // Redirect to the logout page
-        window.location.href = "index.php"; // Replace "logout.php" with your logout page URL
+     
+        window.location.href = "index.php"; 
     }
 </script>
 </body>

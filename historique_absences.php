@@ -22,39 +22,39 @@ include 'db.php'; // Assurez-vous que ce fichier inclut votre connexion à la ba
         font-family: Consolas, monospace;
     }
     table {
-    width: calc(100% - 60px); /* 100% width minus 30px left and 30px right margins */
+    width: calc(100% - 60px); 
     margin-left: 30px;
     margin-right: 30px;
-    border-collapse: separate; /* Separate border model for curved borders */
-    border-spacing: 0; /* No spacing between table cells */
-    border: 1px solid #ddd; /* Light border color */
-    border-radius: 10px; /* Curved border radius */
+    border-collapse: separate; 
+    border-spacing: 0; 
+    border: 1px solid #ddd; 
+    border-radius: 10px; 
 }
 
-/* Styles pour les cellules de tableau */
+
 th, td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
 }
 
-/* Styles pour l'en-tête du tableau */
+
 th {
     background-color: #f2f2f2;
 }
 
-/* Styles pour les lignes impaires du tableau */
+
 tr:nth-child(even) {
     background-color: #f2f2f2;
 }
 
-/* Styles pour les liens dans le tableau */
+
 a {
     color: blue;
     text-decoration: none;
 }
 
-/* Styles pour les liens au survol */
+
 a:hover {
     text-decoration: underline;
 }
@@ -204,11 +204,10 @@ a:hover {
 
 
         <?php
-    // Récupérer les valeurs filtrées si elles existent
+    
     $filter_matricule = isset($_GET['matricule']) ? $_GET['matricule'] : '';
 
-    // Construction de la requête SQL en fonction du filtrage par matricule
-  // Construction de la requête SQL en fonction du filtrage par matricule
+
 $sql = "SELECT a.id, a.date_debut, a.date_fin, a.motif, a.statut, u.matricule, u.nom, u.prenom, u.email  
 FROM absence a 
 JOIN utilisateurs u ON u.matricule = a.matricule";
@@ -224,10 +223,9 @@ $sql .= " ORDER BY CASE
   END";
 
 
-    // Exécution de la requête SQL
     $result = $conn->query($sql);
 
-    // Affichage des résultats
+   
     while ($row = $result->fetch_assoc()): ?>
         <tr>
         <td><?= $row["matricule"] ?></td>
@@ -249,10 +247,10 @@ $sql .= " ORDER BY CASE
 <script>
      function resetFilter() {
         document.querySelector('.filter-input').value = '';
-        // Remove the matricule parameter from the URL and resubmit the form
+       
         window.location.href = window.location.pathname;
     }
-    // Function to get the value of a cookie by its name
+   
     function getCookie(cookieName) {
         const name = cookieName + "=";
         const decodedCookie = decodeURIComponent(document.cookie);
@@ -269,20 +267,20 @@ $sql .= " ORDER BY CASE
         return "";
     }
 
-    // Get the value of the 'nom' cookie
+  
     const userName = getCookie('nom');
 
-    // Display the user's name if it exists
+    
     if (userName) {
         document.getElementById('userWelcome').innerText = "Bienvenue, " + userName;
     }
 
-    // Logout function
+    
     function logout() {
-        // Clear the 'nom' cookie
+       
         document.cookie = "nom=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        // Redirect to the logout page
-        window.location.href = "index.php"; // Replace "logout.php" with your logout page URL
+        
+        window.location.href = "index.php"; 
     }
 </script>
 </body>

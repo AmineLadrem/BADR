@@ -9,7 +9,7 @@ if (!isset($_GET['id'])) {
 
 $id_utilisateur = $_GET['id'];
 
-// Récupérer les informations sur l'utilisateur
+ 
 $sql_user = "SELECT nom, prenom FROM utilisateurs WHERE id=?";
 $stmt_user = $conn->prepare($sql_user);
 $stmt_user->bind_param("i", $id_utilisateur);
@@ -19,7 +19,7 @@ $user_row = $result_user->fetch_assoc();
 $user_nom = $user_row['nom'];
 $user_prenom = $user_row['prenom'];
 
-// Récupérer toutes les expériences de l'utilisateur
+
 $sql_exp = "SELECT id_experience, date_debut, date_fin, poste, entreprise, motif FROM experiences WHERE id_utilisateur=?";
 $stmt_exp = $conn->prepare($sql_exp);
 $stmt_exp->bind_param("i", $id_utilisateur);

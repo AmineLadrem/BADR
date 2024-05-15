@@ -18,19 +18,19 @@ body {
 .left-panel {
     width: 100%;
     margin-right: 2%;
-    /* Add a small gap between the panels */
-    height: 80vh; /* Set a fixed height for the left panel */
-    margin: auto; /* Center the left panel horizontally */
+
+    height: 80vh; 
+    margin: auto; 
 }
 
 .form-wrapper {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px; /* Adjust the gap between form fields */
+    gap: 10px; 
 }
 
 .flex-container {
-    flex: 1 1 45%; /* Adjust the width of the flex items */
+    flex: 1 1 45%;
     display: flex;
     align-items: center;
 }
@@ -39,8 +39,8 @@ body {
     width: 70%;
     margin-left: 2%;
     display: none;
-    /* Add a small gap between the panels */
-    margin: auto; /* Center the right panel horizontally */
+
+    margin: auto; 
 }
 
 .button-container {

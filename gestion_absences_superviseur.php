@@ -3,7 +3,7 @@ session_start();
 include 'db.php'; // Include your database connection
 
 if (!isset($_SESSION['email']) || $_SESSION['is_supervisor'] != 1) {
-    header('Location: login.php'); // Redirect to login page if user is not a supervisor
+    header('Location: login.php'); 
     exit;
 }
 
@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $decision = $_POST['decision'];
     $absenceId = $_POST['absenceId'];
 
-    // Update the absence status in the database
+
     $sql = "UPDATE absence SET statut = ? WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("si", $decision, $absenceId);
@@ -20,13 +20,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($stmt->error) {
         echo "Error updating absence status: " . $stmt->error;
     } else {
-        // Redirect to supervisor absence management page
+     
         header("Location: gestion_absences_superviseur.php");
         exit;
     }
 }
 
-// Retrieve pending absences
+
 $result = $conn->query("SELECT * FROM absence WHERE statut = 'En Attente'");
 ?>
 
@@ -69,11 +69,11 @@ $result = $conn->query("SELECT * FROM absence WHERE statut = 'En Attente'");
             <tbody>
             <?php
 while ($row = $result->fetch_assoc()): 
-    // Prepare and execute query to get user information
+
     $getUser = $conn->prepare("SELECT nom, prenom FROM utilisateurs WHERE matricule = ?");
     $getUser->bind_param("i", $row['matricule']);
     $getUser->execute();
-    // Fetch user information
+
     $userInfo = $getUser->get_result()->fetch_assoc();
 ?>
 

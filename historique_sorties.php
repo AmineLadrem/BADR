@@ -12,7 +12,7 @@ function updateDecision($conn, $id, $decision, $dec_rh) {
     $dec_pdg_value = $decision == 'accepter' ? 1 : 0;
     $sql = "UPDATE sortie SET dec_pdg = '$dec_pdg_value'";
 
-    // Update statut based on dec_rh and dec_pdg values
+
     switch ($dec_rh) {
         case 0:
             $statut = 'Refuse';
@@ -25,12 +25,12 @@ function updateDecision($conn, $id, $decision, $dec_rh) {
             break;
     }
 
-    $sql .= ", statut = '$statut'"; // Properly append statut update with a comma
+    $sql .= ", statut = '$statut'"; 
 
-    // Complete the SQL query with the WHERE clause
+    
     $sql .= " WHERE id = '$id'";
 
-    // Debug output
+
    // echo "SQL Query: $sql<br>";
 
     if ($conn->query($sql) === TRUE) {
@@ -45,16 +45,16 @@ function updateDecision($conn, $id, $decision, $dec_rh) {
 
 
  
-// Check if the form is submitted
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id = $_POST['id'];
     $decision = isset($_POST['accepter']) ? 'accepter' : (isset($_POST['refuser']) ? 'refuser' : '');
     $dec_rh = $_POST['dec_rh'];
     
-    // Debug output
+
    // echo "ID: $id, Decision: $decision, Dec_rh: $dec_rh<br>";
     
-    // Update the decision and statut in the database
+
     if (!empty($decision)) {
         if (updateDecision($conn, $id, $decision, $dec_rh)) {
            // echo "Decision updated successfully";
@@ -121,11 +121,10 @@ $result = $conn->query($sql);
     </thead>
     <tbody>
     <?php
-    // Récupérer les valeurs filtrées si elles existent
+  
     $filter_matricule = isset($_GET['matricule']) ? $_GET['matricule'] : '';
 
-    // Construction de la requête SQL en fonction du filtrage par matricule
-    // Construction de la requête SQL en fonction du filtrage par matricule
+ 
 $sql = "SELECT u.matricule, u.nom, u.prenom, s.date_sortie, s.heure_sortie, s.motif, s.statut, s.dec_pdg, s.dec_rh , s.id
 FROM sortie s
 INNER JOIN utilisateurs u ON s.matricule = u.matricule";
@@ -141,10 +140,10 @@ $sql .= " ORDER BY CASE
 END";
 
 
-    // Exécution de la requête SQL
+
     $result = $conn->query($sql);
 
-    // Affichage des résultats
+   
     while ($row = $result->fetch_assoc()): ?>
         <tr>
             <td><?= $row["matricule"] ?></td>
@@ -177,10 +176,10 @@ END";
 <script>
       function resetFilter() {
         document.querySelector('.filter-input').value = '';
-        // Remove the matricule parameter from the URL and resubmit the form
+       
         window.location.href = window.location.pathname;
     }
-    // Function to get the value of a cookie by its name
+  
     function getCookie(cookieName) {
         const name = cookieName + "=";
         const decodedCookie = decodeURIComponent(document.cookie);
@@ -197,20 +196,20 @@ END";
         return "";
     }
 
-    // Get the value of the 'nom' cookie
+
     const userName = getCookie('nom');
 
-    // Display the user's name if it exists
+   
     if (userName) {
         document.getElementById('userWelcome').innerText = "Bienvenue, " + userName;
     }
 
     // Logout function
     function logout() {
-        // Clear the 'nom' cookie
+        
         document.cookie = "nom=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        // Redirect to the logout page
-        window.location.href = "index.php"; // Replace "logout.php" with your logout page URL
+ 
+        window.location.href = "index.php"; 
     }
 </script>
 </body>

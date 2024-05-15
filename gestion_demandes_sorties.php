@@ -3,7 +3,7 @@ session_start();
 include 'db.php'; // Include your database connection
 
 if (!isset($_SESSION['email']) || $_SESSION['is_supervisor'] != 1) {
-    header('Location: index.php'); // Redirect to login page if user is not a supervisor
+    header('Location: index.php'); 
     exit;
 }
 
@@ -45,13 +45,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $sql .= " WHERE id = '$demandeId'";
 
  
-        // Mettre à jour le statut de la demande
+      
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $stmt->close();
        
     } else {
-        // Gérer le cas où aucune demande correspondante n'est trouvée
+       
         echo "Aucune demande de congé correspondante trouvée.";
     }
 }
@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <?php 
      $filter_matricule = isset($_GET['matricule']) ? $_GET['matricule'] : '';
 
-     // Construction de la requête SQL en fonction du filtrage par matricule
+     
      $sql = "SELECT u.matricule, u.nom, u.prenom, s.date_sortie, s.heure_sortie, s.motif, s.statut, u.email, s.dec_rh, s.dec_pdg, s.id
      FROM sortie s
      INNER JOIN utilisateurs u ON s.matricule = u.matricule";
@@ -112,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
  END";
  
     
-    // Execute SQL query to get pending absences
+
     $stmt = $conn->prepare($sql);
     
     $stmt->execute();
@@ -161,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <script>
          function resetFilter() {
         document.querySelector('.filter-input').value = '';
-        // Remove the matricule parameter from the URL and resubmit the form
+       
         window.location.href = window.location.pathname;
     }
     </script>

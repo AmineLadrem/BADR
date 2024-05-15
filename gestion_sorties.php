@@ -11,12 +11,12 @@ $email = $_SESSION['email'];
 $matricule = $_SESSION['matricule'];
 $dateToday = date("Y-m-d");  // Récupère la date d'aujourd'hui au format année-mois-jour
 
-// Gestion de CSRF token
+
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// Traitement du formulaire de demande de sortie
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         die('CSRF token validation failed');
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->execute();
         $stmt->close();
         
-        // Redirection pour éviter la resoumission du formulaire
+
         header("Location: gestion_sorties.php");
         exit;
     } else {
@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// Récupérer les sorties de l'utilisateur connecté
+
 $query = $conn->prepare("SELECT id, date_sortie ,heure_sortie, motif, statut FROM sortie WHERE matricule = ? ORDER BY CASE WHEN statut = 'En Attente' THEN 1 WHEN statut = 'Accepté' THEN 2 ELSE 3 END");
 
 
@@ -150,12 +150,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                 xhr.onload = function() {
                     if (xhr.status === 200) {
-                        // Deletion successful
+                   
                         alert("La demande de sortie a été supprimée avec succès.");
-                        // Redirect to gestion_sorties.php
+                    
                         window.location.href = 'gestion_sorties.php';
                     } else {
-                        // Failed to delete
+                    
                         alert("Erreur lors de la suppression de la demande de sortie. Veuillez réessayer.");
                     }
                 };

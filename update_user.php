@@ -3,14 +3,14 @@ session_start();
 
 include 'db.php';
 
-// Check if ID is provided and valid
+
 if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     $id = $_GET['id'];
 } else {
     die('ID invalide ou non fourni');
 }
 
-// Fetch user data from the database
+
 $sql = "SELECT * FROM utilisateurs WHERE id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id);
@@ -21,7 +21,7 @@ if ($result->num_rows == 0) {
 }
 $user = $result->fetch_assoc();
 
-// Process update form
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update'])) {
     $nom = $_POST['nom'];
     $prenom = $_POST['prenom'];
@@ -61,7 +61,7 @@ $conn->close();
     <link rel="stylesheet" href="styles/gestion_employes.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
     <style>
-        /* style2.css */
+       
 
 fieldset {
     border: 1px solid #ccc;

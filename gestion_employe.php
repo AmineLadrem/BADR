@@ -38,14 +38,13 @@ function phoneExists($conn, $telephone) {
 }
 
 function generateMatricule($date_debut, $date_naissance, $telephone) {
-    // Format the dates (assuming they're in YYYY-MM-DD format)
+   
     $formatted_date_debut = date("Ymd", strtotime($date_debut));
     $formatted_date_naissance = date("Ymd", strtotime($date_naissance));
 
-    // Concatenate formatted dates and phone number
+   
     $matricule = $formatted_date_debut . $formatted_date_naissance . $telephone;
 
-    // Optionally, you can hash the matricule to ensure uniqueness
     // $matricule = md5($matricule);
 
     return $matricule;
@@ -79,17 +78,16 @@ function insertDiplomaData($conn, $email, $type_diplome, $domaine, $lieu_obtenti
         return "Aucun diplôme à insérer";
     }
 
-    // Check if all arrays have the same length
     $count = count($type_diplome);
     if (count($domaine) !== $count || count($lieu_obtention) !== $count || count($date_obtention) !== $count) {
         return "Erreur: Les tableaux doivent avoir la même longueur";
     }
     
-    // Prepare the SQL statement for inserting diplomas
+
     $sql = "INSERT INTO diplome (matricule, type_diplome, domaine, lieu_obtention, date_obtention) VALUES ((SELECT matricule FROM utilisateurs WHERE email = ? LIMIT 1), ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
 
-    // Bind parameters and execute the statement for each diploma record
+
     for ($i = 0; $i < $count; $i++) {
         $stmt->bind_param("sssss", $email, $type_diplome[$i], $domaine[$i], $lieu_obtention[$i], $date_obtention[$i]);
         $stmt->execute();
@@ -102,24 +100,24 @@ function insertDiplomaData($conn, $email, $type_diplome, $domaine, $lieu_obtenti
     return "Diplômes insérés avec succès";
 }
 
-// Insert experience data
+
 
 function insertExperienceData($conn, $email, $entreprise, $poste, $date_debut, $date_fin,$motif) {
     if (empty($entreprise) || empty($poste) || empty($date_debut) || empty($date_fin) || empty($motif)) {
         return "Aucune expérience à insérer";
     }
-    // Check if all arrays have the same length
+
     $count = count($entreprise);
     if (count($poste) !== $count || count($date_debut) !== $count || count($date_fin) !== $count) {
         return "Erreur: Les tableaux doivent avoir la même longueur";
     }
     
-    // Prepare the SQL statement for inserting experiences
+
     $sql = "INSERT INTO experience (matricule, entreprise, poste, date_debut, date_fin, motif) VALUES ((SELECT matricule FROM utilisateurs WHERE email = ? LIMIT 1), ?, ?, ?, ?, ?)";
 
     $stmt = $conn->prepare($sql);
 
-    // Bind parameters and execute the statement for each experience record
+
     for ($i = 0; $i < $count; $i++) {
         $stmt->bind_param("ssssss", $email, $entreprise[$i], $poste[$i], $date_debut[$i], $date_fin[$i], $motif[$i]);
         $stmt->execute();
@@ -157,11 +155,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $entreprise = $_POST['entreprise'];
     $motif = $_POST['motif'];
 
-    // Insert user data
+
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Insert user data
+
     insertUserData($conn, $nom, $prenom, $date_naissance, $telephone, $email, $matricule, $joursCongesRestants, $is_supervisor, $salaire, $statut, $service, $poste, $est_superieur_hierarchique);
 
 
@@ -170,7 +168,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         insertDiplomaData($conn, $email, $type_diplome, $domaine, $lieu_obtention, $date_obtention);
     }
 
-    // Insert experience data if the array is not empty
+
     if (!empty($entreprise)) {
         insertExperienceData($conn, $email, $entreprise, $poste_experience, $date_debut_exp, $date_fin_exp,$motif);
     }
@@ -179,7 +177,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $currentDate = date('Y-m-d H:i:s');
 
-    // Insert into compte_utilisateur table
     $sql = "INSERT INTO compte_utilisateur (mdp, matricule, date_creation) VALUES (?, ?, ?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("sss", $matricule, $matricule, $currentDate);
@@ -233,7 +230,7 @@ $result = $conn->query($sql);
         <<div class="right-panel">
             <h1>Les informations personnelles</h1>
             <form class="app_form" method="post">
-                <!-- Fields for utilisateur table -->
+
                 <div class="form-wrapper personal-info">
                     <div class="flex-container">
                         <label for="nom">Nom:</label>
@@ -284,7 +281,7 @@ $result = $conn->query($sql);
 
                 </div>
 
-                <!-- Fields for diplome table -->
+
                 <h1>Diplôme</h1>
                 <div class="form-wrapper diplome-info">
                     <div class="flex-container">
@@ -327,7 +324,6 @@ $result = $conn->query($sql);
                 </div>
 
 
-                <!-- Fields for experiences table -->
                 <h1>Experience</h1>
                 <div class="form-wrapper experience-info">
                     <div class="flex-container">
@@ -376,7 +372,7 @@ $result = $conn->query($sql);
                 </div>
                 <button name="add-user" type="submit" style="margin-bottom: 15px;"><i class="fas fa-plus"></i> Ajouter Utilisateur</button>
 
-                <!-- Buttons -->
+       
 
                 <!--   <button type="button" onclick="window.print()"><i class="fas fa-print"></i></button>-->
                 <?php if (isset($error)) : ?>
@@ -391,7 +387,7 @@ $result = $conn->query($sql);
     <div class="left-panel">
         <h1>Liste des utilisateurs</h1>
 
-        <!-- Formulaire de filtrage -->
+
         <form class="filter-form" action="" method="GET">
             <input class="filter-input" type="text" name="matricule" placeholder="Matricule...">
             <button class="filter-button" type="submit">Filtrer</button>
@@ -418,19 +414,18 @@ $result = $conn->query($sql);
             </thead>
             <tbody>
                 <?php
-                // Récupérer les valeurs filtrées si elles existent
+               
                 $filter_matricule = isset($_GET['matricule']) ? $_GET['matricule'] : '';
 
-                // Construction de la requête SQL en fonction du filtrage par matricule
+      
                 $sql = "SELECT matricule, nom, prenom, date_naissance, telephone, email, salaire, statut, service, poste, est_superieur_hierarchique FROM utilisateurs";
                 if (!empty($filter_matricule)) {
                     $sql .= " WHERE matricule LIKE '%$filter_matricule%'";
                 }
 
-                // Exécution de la requête SQL
                 $result = $conn->query($sql);
 
-                // Affichage des résultats
+               
                 while ($row = $result->fetch_assoc()) : ?>
                     <tr>
                         <td><?= $row["matricule"] ?></td>
@@ -466,14 +461,14 @@ $result = $conn->query($sql);
     <script>
 
 function editUser(matricule) {
-    // Retrieve user information via AJAX request
+   
     const xhr = new XMLHttpRequest();
     xhr.open('GET', 'get_user_info.php?matricule=' + encodeURIComponent(matricule), true);
     xhr.onload = function () {
         if (xhr.status === 200) {
             const userData = JSON.parse(xhr.responseText);
 
-            // Populate form fields with user information
+       
             document.getElementById('nom').value = userData.nom;
             document.getElementById('prenom').value = userData.prenom;
             document.getElementById('date_naissance').value = userData.date_naissance;
@@ -484,7 +479,7 @@ function editUser(matricule) {
             document.getElementById('service').value = userData.service;
             document.getElementById('poste').value = userData.poste;
 
-            // Hide the add user panel and show the edit user panel
+         
             showUserListPanel();
             showAddUserPanel();
         } else {
@@ -496,23 +491,23 @@ function editUser(matricule) {
 
 
 document.addEventListener('DOMContentLoaded', function () {
-        // Add event listener to all delete user icons
+     
         const deleteIcons = document.querySelectorAll('.delete-user');
         deleteIcons.forEach(icon => {
             icon.addEventListener('click', function () {
-                // Get the corresponding matricule from the table row
+               
                 const row = this.closest('tr');
                 const matricule = row.querySelector('td:first-child').textContent;
 
-                // Confirm deletion
+               
                 if (confirm("Are you sure you want to delete this user?")) {
-                    // Send AJAX request to delete user
+              
                     const xhr = new XMLHttpRequest();
                     xhr.open('POST', 'delete_user.php', true);
                     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
                     xhr.onload = function () {
                         if (xhr.status === 200) {
-                            // Remove row from table upon successful deletion
+                            
                             row.remove();
                         } else {
                             alert('Error deleting user');
@@ -550,7 +545,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <td><a onclick="removeDiplomeRow(this)"><i class="fas fa-trash-alt"></i></a></td>
     `;
 
-            // Clear input fields
+ 
             document.getElementById('type_diplome').value = '';
             document.getElementById('domaine').value = '';
             document.getElementById('lieu_obtention').value = '';
@@ -575,7 +570,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <td><a onclick="removeExperienceRow(this)"><i class="fas fa-trash-alt"></i></a></td>
     `;
 
-            // Clear input fields
+            
             document.getElementById('date_debut').value = '';
             document.getElementById('date_fin').value = '';
             document.getElementById('poste_experience').value = '';
@@ -587,7 +582,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         function removeDiplomeRow(button) {
-            // Demander confirmation avant de supprimer la ligne
+             
             if (confirm("Êtes-vous sûr de vouloir supprimer ce diplôme ?")) {
                 const row = button.closest('tr');
                 row.parentNode.removeChild(row);
@@ -595,7 +590,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         function removeExperienceRow(button) {
-            // Demander confirmation avant de supprimer la ligne
+            
             if (confirm("Êtes-vous sûr de vouloir supprimer cette expérience ?")) {
                 const row = button.closest('tr');
                 row.parentNode.removeChild(row);

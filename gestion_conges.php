@@ -12,7 +12,7 @@ $email = $_SESSION['email'];
 $matricule = $_SESSION['matricule'];
 $dateToday = date("Y-m-d");
 
-// Vérifier et afficher les jours de congés restants
+
 $daysQuery = $conn->prepare("SELECT joursCongesRestants FROM utilisateurs WHERE matricule = ?");
 $daysQuery->bind_param("s", $matricule);
 $daysQuery->execute();
@@ -179,12 +179,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                 xhr.onload = function() {
                     if (xhr.status === 200) {
-                        // Deletion successful
+                        
                         alert("La demande de congé a été supprimée avec succès.");
-                        // Redirect to gestion_conges.php
+                   
                         window.location.href = 'gestion_conges.php';
                     } else {
-                        // Failed to delete
+                   
                         alert("Erreur lors de la suppression de la demande de congé. Veuillez réessayer.");
                     }
                 };
