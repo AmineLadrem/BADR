@@ -13,7 +13,7 @@ h1 {
     margin-bottom: 30px;
 }
 
-button[value="accepte"] {
+button[value="Accepté"] {
     color: #fff;
     margin-right: 5px;
     background-color: #4CAF50;
@@ -25,11 +25,11 @@ button[value="accepte"] {
     transition: background-color 0.3s;
 }
 
-button[value="accepte"]:hover {
+button[value="Accepté"]:hover {
     background-color: #45a049;
 }
 
-button[value="refuse"] {
+button[value="Refusé"] {
     color: #fff;
     margin-right: 5px;
     background-color: #dd3939;
@@ -41,7 +41,7 @@ button[value="refuse"] {
     transition: background-color 0.3s;
 }
 
-button[value="refuse"]:hover {
+button[value="Refusé"]:hover {
     background-color: #e41d1d;
 }
  

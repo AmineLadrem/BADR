@@ -7,30 +7,56 @@ if (!isset($_SESSION['email']) || $_SESSION['is_supervisor'] != 1) {
     exit;
 }
 
-$filter_matricule = isset($_GET['matricule']) ? $_GET['matricule'] : '';
+if ($_SERVER['REQUEST_METHOD'] == 'POST') { 
+    $demandeId = $_POST['demandeId'];
+    $decision = $_POST['decision'];
 
-    // Construction de la requête SQL en fonction du filtrage par matricule
-  // Construction de la requête SQL en fonction du filtrage par matricule
-$sql = "SELECT u.matricule, u.nom, u.prenom, s.date_sortie, s.heure_sortie, s.motif, s.statut, u.email, s.dec_rh, s.dec_pdg, s.id
-FROM sortie s
-INNER JOIN utilisateurs u ON s.matricule = u.matricule";
+    $demandeInfo = $conn->prepare("SELECT matricule, date_sortie, heure_sortie, dec_pdg FROM sortie WHERE id = ?");
+    $demandeInfo->bind_param("i", $demandeId);
+    $demandeInfo->execute();
+    $result = $demandeInfo->get_result();
 
-if (!empty($filter_matricule)) {
-$sql .= " WHERE u.matricule LIKE '%$filter_matricule%'";
+    if ($result->num_rows > 0) {
+        $info = $result->fetch_assoc();      
+        if ($decision === 'accepter') {
+            $status = 'Accepté';
+            $dec_rh=1;
+        } else {
+            $status = 'Refusé';
+            $dec_rh=0;
+        }
+
+        $sql = "UPDATE sortie SET dec_rh = '$dec_rh'";
+
+        switch ($info['dec_pdg']) {
+            case 0:
+                $statut = 'Refusé';
+                break;
+            case 1:
+                $statut = $decision == 'accepter' ? 'Accepté' : 'Refusé';
+                break;
+            case 2:
+                $statut = $decision == 'accepter' ? 'En Attente' : 'Refusé';
+                break;
+        }
+
+        $sql .= ", statut = '$statut'"; 
+
+        $sql .= " WHERE id = '$demandeId'";
+
+ 
+        // Mettre à jour le statut de la demande
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $stmt->close();
+       
+    } else {
+        // Gérer le cas où aucune demande correspondante n'est trouvée
+        echo "Aucune demande de congé correspondante trouvée.";
+    }
 }
-
-$sql .= " ORDER BY CASE 
-    WHEN s.statut = 'En attente' THEN 1 
-    WHEN s.statut = 'Accepté' THEN 2 
-    ELSE 3 
-END";
-
-// Execute SQL query to get pending absences
-$stmt = $conn->prepare($sql);
-
-$stmt->execute();
-$result = $stmt->get_result();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -64,7 +90,34 @@ $result = $stmt->get_result();
 
 </form>
 
-        <?php if ($result->num_rows > 0): ?>
+        <?php 
+     $filter_matricule = isset($_GET['matricule']) ? $_GET['matricule'] : '';
+
+     // Construction de la requête SQL en fonction du filtrage par matricule
+     $sql = "SELECT u.matricule, u.nom, u.prenom, s.date_sortie, s.heure_sortie, s.motif, s.statut, u.email, s.dec_rh, s.dec_pdg, s.id
+     FROM sortie s
+     INNER JOIN utilisateurs u ON s.matricule = u.matricule";
+ 
+ if (!empty($filter_matricule)) {
+     $sql .= " WHERE u.matricule LIKE '%$filter_matricule%' AND s.dec_rh = 2 AND (s.dec_pdg = 2 OR s.dec_pdg = 1)";
+ }
+ else{
+    $sql .= " WHERE s.dec_rh = 2 AND (s.dec_pdg = 2 OR s.dec_pdg = 1)";
+ }
+ 
+ $sql .= " ORDER BY CASE 
+     WHEN s.statut = 'En Attente' THEN 1 
+     WHEN s.statut = 'Accepté' THEN 2 
+     ELSE 3 
+ END";
+ 
+    
+    // Execute SQL query to get pending absences
+    $stmt = $conn->prepare($sql);
+    
+    $stmt->execute();
+    $result = $stmt->get_result();
+        if ($result->num_rows > 0): ?>
         <table>
             <thead>
                 <tr>
@@ -87,11 +140,13 @@ $result = $stmt->get_result();
                         <td><?= isset($row["heure_sortie"]) ? $row["heure_sortie"] : "Non défini" ?></td>
                         <td><?= isset($row["motif"]) ? $row["motif"] : "Non défini" ?></td>
                         <td>
-                            <form method="post">
-                                <input type="hidden" name="absenceId" value="<?= $row['id'] ?>">
-                                <button type="submit" name="decision" value="accepter">Accepter</button>
-                                <button type="submit" name="decision" value="refuser">Refuser</button>
-                            </form>
+                        <form method="post">
+    <input type="hidden" name="formType" value="form1">
+    <input type="hidden" name="demandeId" value="<?= $row['id'] ?>">
+    <button type="submit" name="decision" value="accepter">Accepter</button>
+    <button type="submit" name="decision" value="refuser">Refuser</button>
+</form>
+
                         </td>
                     </tr>
                 <?php endwhile; ?>

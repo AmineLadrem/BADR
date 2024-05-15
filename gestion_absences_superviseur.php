@@ -1,9 +1,9 @@
 <?php
 session_start();
-include 'db.php'; // Inclure votre connexion à la base de données
+include 'db.php'; // Include your database connection
 
 if (!isset($_SESSION['email']) || $_SESSION['is_supervisor'] != 1) {
-    header('Location: login.php'); // Rediriger vers la page de connexion si l'utilisateur n'est pas un superviseur
+    header('Location: login.php'); // Redirect to login page if user is not a supervisor
     exit;
 }
 
@@ -11,23 +11,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $decision = $_POST['decision'];
     $absenceId = $_POST['absenceId'];
 
-    // Mettre à jour le statut de l'absence dans la base de données
-    $sql = "UPDATE absences SET statut = ? WHERE id = ?";
+    // Update the absence status in the database
+    $sql = "UPDATE absence SET statut = ? WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("si", $decision, $absenceId);
     $stmt->execute();
 
     if ($stmt->error) {
-        echo "Erreur lors de la mise à jour du statut de l'absence: " . $stmt->error;
+        echo "Error updating absence status: " . $stmt->error;
     } else {
-        // Rediriger vers la page de gestion des absences du superviseur
+        // Redirect to supervisor absence management page
         header("Location: gestion_absences_superviseur.php");
         exit;
     }
 }
 
-// Récupérer les absences en attente
-$result = $conn->query("SELECT * FROM absence WHERE statut = 'en attente'");
+// Retrieve pending absences
+$result = $conn->query("SELECT * FROM absence WHERE statut = 'En Attente'");
 ?>
 
 <!DOCTYPE html>
@@ -68,7 +68,6 @@ $result = $conn->query("SELECT * FROM absence WHERE statut = 'en attente'");
             </thead>
             <tbody>
             <?php
-// Inside the while loop where you fetch each row of absence
 while ($row = $result->fetch_assoc()): 
     // Prepare and execute query to get user information
     $getUser = $conn->prepare("SELECT nom, prenom FROM utilisateurs WHERE matricule = ?");
@@ -78,7 +77,6 @@ while ($row = $result->fetch_assoc()):
     $userInfo = $getUser->get_result()->fetch_assoc();
 ?>
 
-<!-- Inside the table row -->
 <tr>
     <td><?= htmlspecialchars($userInfo['nom'] . ' ' . $userInfo['prenom']) ?></td>
     <td><?= htmlspecialchars($row['date_debut']) ?></td>
@@ -88,8 +86,8 @@ while ($row = $result->fetch_assoc()):
         <div class="form-container">
             <form method="post">
                 <input type="hidden" name="absenceId" value="<?= $row['id'] ?>">
-                <button type="submit" name="decision" value="accepte">Accepter</button>
-                <button type="submit" name="decision" value="refuse">Refuser</button>
+                <button type="submit" name="decision" value="Accepté">Accepter</button>
+                <button type="submit" name="decision" value="Refusé">Refuser</button>
             </form>
         </div>
     </td>

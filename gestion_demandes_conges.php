@@ -9,11 +9,12 @@ if (!isset($_SESSION['email']) || $_SESSION['is_supervisor'] != 1) {
 $dateToday = date("Y-m-d");
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['formType']) && $_POST['formType'] === 'form1') {
     $decision = $_POST['decision'];
     $justificatif = $_POST['justificatif'] ?? '';
     $demandeId = $_POST['demandeId'];
 
-    $demandeInfo = $conn->prepare("SELECT matricule, dateDebut, dateFin , justificatif FROM demandesConges WHERE id = ?");
+    $demandeInfo = $conn->prepare("SELECT matricule, dateDebut, dateFin , justificatif,dec_pdg FROM conge WHERE id = ?");
     $demandeInfo->bind_param("i", $demandeId);
     $demandeInfo->execute();
     $result = $demandeInfo->get_result();
@@ -26,9 +27,10 @@ $getUser->bind_param("i", $info['matricule']);
 
     $getUser->execute();
     $result = $getUser->get_result();
-    $info = $result->fetch_assoc();
+    $infoUser = $result->fetch_assoc();
+    $joursRestants=$info['matricule'];
 
-        // Vérifier si les dates sont non nulles avant de les utiliser
+         
         if ($info['dateDebut'] !== null && $info['dateFin'] !== null) {
             $debut = new DateTime($info['dateDebut']);
             $fin = new DateTime($info['dateFin']);
@@ -36,20 +38,44 @@ $getUser->bind_param("i", $info['matricule']);
             $daysRequested = $interval->days + 1;
 
             if ($decision === 'accepter') {
-                $status = 'Acceptée';
+                $status = 'Accepté';
+                $dec_rh=1;
             } else {
-                $status = 'Refusée';
+                $status = 'Refusé';
+                $dec_rh=0;
 
                 // Restituer les jours si la demande est refusée
-                $updateDays = $conn->prepare("UPDATE utilisateurs SET joursCongesRestants = joursCongesRestants + ? WHERE email = ?");
-                $updateDays->bind_param("is", $daysRequested, $info['email']);
+                $updateDays = $conn->prepare("UPDATE utilisateurs SET joursCongesRestants = joursCongesRestants + ? WHERE matricule = ?");
+                $updateDays->bind_param("is", $daysRequested, $ininfoUserfo['matricule']);
                 $updateDays->execute();
                 $updateDays->close();
             }
 
+            $sql = "UPDATE conge SET dec_rh = '$dec_rh'";
+
+    // Update statut based on dec_rh and dec_pdg values
+    switch ($info['dec_pdg']) {
+        case 0:
+            $statut = 'Refusé';
+            break;
+        case 1:
+            $statut = $decision == 'accepter' ? 'Accepté' : 'Refusé';
+            break;
+        case 2:
+            $statut = $decision == 'accepter' ? 'En Attente' : 'Refusé';
+            break;
+    }
+
+    $sql .= ", statut = '$statut'"; // Properly append statut update with a comma
+
+    // Complete the SQL query with the WHERE clause
+    $sql .= " WHERE id = '$demandeId'";
+
+
+
+
             // Mettre à jour le statut de la demande
-            $stmt = $conn->prepare("UPDATE conge SET statut = ?, justificatif = ? WHERE id = ?");
-            $stmt->bind_param("ssi", $status, $justificatif, $demandeId);
+            $stmt = $conn->prepare($sql);
             $stmt->execute();
             $stmt->close();
         } else {
@@ -61,8 +87,86 @@ $getUser->bind_param("i", $info['matricule']);
         echo "Aucune demande de congé correspondante trouvée.";
     }
 }
+elseif (isset($_POST['formType']) && $_POST['formType'] === 'form2') {
+    // Gather form data
+    $matricule_user = $_POST['matricule'];
+    $dateDebut = $_POST['dateDebut'];
+    $dateFin = $_POST['dateFin'];
+    $justificatif = $_POST['justificatif'] ?? '';
+    $remarque = $_POST['remarque'] ?? '';
+    
+    // Check if the checkbox is checked
+    $congeExceptionnel = isset($_POST['congeExceptionnel']) ? 1 : 0;
 
-$result = $conn->query("SELECT * FROM conge WHERE statut = 'En attente'");
+    $debut = new DateTime($dateDebut);
+    $fin = new DateTime($dateFin);
+    $interval = $debut->diff($fin);
+    $daysRequested = $interval->days + 1;
+
+    $getUser = $conn->prepare("SELECT nom, prenom, joursCongesRestants FROM utilisateurs WHERE matricule = ?");
+    $getUser->bind_param("i", $matricule_user);
+    $getUser->execute();
+    
+    if (!$getUser) {
+        die("Error executing query: " . $conn->error);
+    }
+    
+    $result = $getUser->get_result();
+    
+    if (!$result) {
+        die("Error getting result: " . $getUser->error);
+    }
+    
+    if ($result->num_rows > 0) {
+        $infoUser = $result->fetch_assoc();
+        $joursRestants = $infoUser['joursCongesRestants'];
+    } else {
+        die("No user found with the provided matricule.");
+    }
+    
+
+    if ($daysRequested <= $joursRestants) {
+        $joursRestants -= $daysRequested;
+        $updateDays = $conn->prepare("UPDATE utilisateurs SET joursCongesRestants = ? WHERE matricule = ?");
+        $updateDays->bind_param("is", $joursRestants, $matricule_user);
+        $updateDays->execute();
+        $updateDays->close();
+
+        if ($congeExceptionnel != 1) {
+            $insertConge = $conn->prepare("INSERT INTO conge (matricule, dateDebut, dateFin, justificatif, dec_rh, dec_pdg, statut) VALUES (?, ?, ?, ?, 2, 2, 'En Attente')");
+        } else {
+            $insertConge = $conn->prepare("INSERT INTO conge (matricule, dateDebut, dateFin, justificatif, dec_rh, dec_pdg, statut) VALUES (?, ?, ?, ?, 1, 1, 'Accepté')");
+        }
+
+        $insertConge->bind_param("isss", $matricule_user, $dateDebut, $dateFin, $justificatif);
+
+        if ($insertConge->execute()) {
+            // Check if the checkbox is checked before accessing it
+            if ($congeExceptionnel == 1) {
+                $excep = $remarque;
+                // Insert data into 'conge_excep' table
+                $insertCongeExcep = $conn->prepare("INSERT INTO conge_excep (matricule, excep, id_cong) VALUES (?, ?, LAST_INSERT_ID())");
+                $insertCongeExcep->bind_param("is", $matricule_user, $excep);
+                $insertCongeExcep->execute();
+                $insertCongeExcep->close();
+            }
+
+            header('Location: ' . $_SERVER['REQUEST_URI']);
+            exit;
+        } else {
+            echo "Erreur lors de l'envoi de la demande de congé.";
+        }
+
+        $insertConge->close();
+    } else {
+        $error = "Vous ne pouvez pas demander $daysRequested jours. Il vous reste seulement $joursRestants jours de congés.";
+    }
+}
+
+}
+
+
+$result = $conn->query("SELECT * FROM conge WHERE dec_rh = 2 and (dec_pdg=2 OR dec_pdg=1)");
 ?>
 
 <!DOCTYPE html>
@@ -93,7 +197,7 @@ $result = $conn->query("SELECT * FROM conge WHERE statut = 'En attente'");
 <button onclick="showUserListPanel()">Congé exceptionnels</button>
 
 </div>
-<div class="right-panel">
+<div class="left-panel">
     <div class="container">
     <table>
         <tr>
@@ -102,6 +206,7 @@ $result = $conn->query("SELECT * FROM conge WHERE statut = 'En attente'");
             <th>Date de début</th>
             <th>Date de fin</th>
             <th>Justificatif</th>
+            <th>Decision PDG</th>
             <th>Action</th>
         </tr>
         <?php while ($row = $result->fetch_assoc()): ?>
@@ -117,11 +222,15 @@ $result = $conn->query("SELECT * FROM conge WHERE statut = 'En attente'");
         <td><?= htmlspecialchars($row['dateDebut']) ?></td>
         <td><?= htmlspecialchars($row['dateFin']) ?></td>
         <td><?= htmlspecialchars($row['justificatif']) ?></td>
+        <td><?= $row["dec_pdg"] == 1 ? 'Acceptée' : ($row["dec_pdg"] == 2 ? 'En Attente' : 'Refusée') ?></td>
         <td>
             <div class="form-container">
                 <form method="post">
+                <input type="hidden" name="formType" value="form1">
                     <input type="hidden" name="demandeId" value="<?= $row['id'] ?>">
                     <input type="textarea" name="justificatif" placeholder="Justificatif (facultatif)">
+                    <br>
+    <br>
                     <button type="submit" name="decision" value="accepter">Accepter</button>
                     <button type="submit" name="decision" value="refuser">Refuser</button>
                 </form>
@@ -133,12 +242,16 @@ $result = $conn->query("SELECT * FROM conge WHERE statut = 'En attente'");
     </table>
     </div>
 </div>
-<div class="left-panel">
+<div class="right-panel">
     <div class="container">
    
     <form method="post" action="">
-    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-    
+ 
+    <input type="hidden" name="formType" value="form2">
+
+    <label for="justificatif">Matricule</label>
+    <input type="number" name="matricule" id="matricule"></input>
+
     <label for="dateDebut">Date de début</label>
     <input type="date" name="dateDebut" id="dateDebut" min="<?= $dateToday ?>" required>
     
@@ -147,13 +260,14 @@ $result = $conn->query("SELECT * FROM conge WHERE statut = 'En attente'");
     
     <label for="justificatif">Justificatif (facultatif)</label>
     <textarea name="justificatif" id="justificatif"></textarea>
+
     
     <br>
 
     <br>
 
     <label for="congeExceptionnel">Congé exceptionnel ?</label>
-    <input type="checkbox" id="congeExceptionnel" name="congeExceptionnel">
+    <input type="checkbox" id="congeExceptionnel" name="congeExceptionnel" value=1>
  
     
     <div id="congeExceptionnelInputs" style="display: none;">
@@ -180,7 +294,7 @@ $result = $conn->query("SELECT * FROM conge WHERE statut = 'En attente'");
     <?php endif; ?>
     <br>
     <br>
-    <button type="submit"><i class="fas fa-paper-plane"></i> Envoyer demande de congé</button>
+    <button name="send_req" type="submit"><i class="fas fa-paper-plane"></i> Envoyer demande de congé</button>
 
 </form>
 

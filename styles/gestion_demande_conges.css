@@ -17,6 +17,7 @@ body {
 button[value="accepter"] {
     color: #fff;
     margin-right: 5px;
+    font-weight: bold;
     background-color: #4CAF50;
     padding: 10px 20px;
     border: none;
@@ -33,6 +34,7 @@ button[value="accepter"]:hover {
 button[value="refuser"] {
     color: #fff;
     margin-right: 5px;
+    font-weight: bold;
     background-color: #dd3939;
     padding: 10px 20px;
     border: none;
@@ -49,6 +51,15 @@ button[value="refuser"]:hover {
 input[type="textarea"]  {
     width: 200px;
     height: 100px; /* Adjust the width as needed */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+input[type="number"]  {
+    width: 200px;
+    height: 35px; /* Adjust the width as needed */
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -190,7 +201,7 @@ form textarea {
 }
 
 
-form button[type="submit"] {
+form button[name="send_req"] {
     padding: 10px 20px;
     background-color: #148d04;
     font-weight: bold;
@@ -201,7 +212,7 @@ form button[type="submit"] {
     transition: background-color 0.3s;
 }
 
-form button[type="submit"]:hover {
+form button[name="send_req"]:hover {
     background-color: #0e6b03;
 }
 
@@ -243,4 +254,12 @@ input[type="checkbox"]:checked::before {
     color: white; /* Set checkmark color */
     text-align: center; /* Center the checkmark */
     line-height: 20px; /* Match the height of the checkbox */
+}
+
+.error {
+    color: red;
+    margin-top: 20px;
+    text-align: left;
+    font-size: large;
+    font-weight: bold;
 }

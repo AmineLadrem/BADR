@@ -134,6 +134,14 @@ button[type="button"]:hover {
     background-color: #45a049;
 }
 
+.delete-user:hover{
+    cursor: pointer;
+}
+
+.update-user:hover{
+    cursor: pointer;
+}
+
 .error {
     color: #ff0000;
     margin-top: 10px;
