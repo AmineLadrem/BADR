@@ -165,7 +165,11 @@ elseif (isset($_POST['formType']) && $_POST['formType'] === 'form2') {
 }
 
 
-$result = $conn->query("SELECT * FROM conge WHERE dec_rh = 2 and (dec_pdg=2 OR dec_pdg=1)");
+$result = $conn->query("SELECT * FROM conge ORDER BY CASE 
+WHEN statut = 'En Attente' THEN 1 
+WHEN statut = 'Accepté' THEN 2 
+ELSE 3 
+END");
 ?>
 
 <!DOCTYPE html>
@@ -227,11 +231,16 @@ $result = $conn->query("SELECT * FROM conge WHERE dec_rh = 2 and (dec_pdg=2 OR d
                 <form method="post">
                 <input type="hidden" name="formType" value="form1">
                     <input type="hidden" name="demandeId" value="<?= $row['id'] ?>">
-                    <input type="textarea" name="justificatif" placeholder="Justificatif (facultatif)">
-                    <br>
-    <br>
-                    <button type="submit" name="decision" value="accepter">Accepter</button>
-                    <button type="submit" name="decision" value="refuser">Refuser</button>
+ 
+    <?php
+            if ($row['dec_rh'] == 2 && ($row['dec_pdg'] == 2 || $row['dec_pdg'] == 1)) {
+                echo '      <input type="textarea" name="justificatif" placeholder="Justificatif (facultatif)">
+                <br>
+<br>';
+                echo '<button type="submit" name="decision" value="accepter">Accepter</button>';
+                echo '<button type="submit" name="decision" value="refuser">Refuser</button>';
+            }
+            ?>
                 </form>
             </div>
         </td>
@@ -281,8 +290,11 @@ $result = $conn->query("SELECT * FROM conge WHERE dec_rh = 2 and (dec_pdg=2 OR d
 
 <br>
     <br>      
-        <label for="remarque">Remarque</label>
-        <textarea name="remarque" id="remarque"></textarea>
+        <label for="remarque">Exception</label>
+        <select id="remarque" name="remarque" required>
+        <option value="Maladie">Maladie</option>
+        <option value="Maternité">Maternité</option>
+    </select>
     </div>
     <br>
 

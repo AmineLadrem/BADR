@@ -181,7 +181,9 @@ form label {
 }
 
 form input[type="date"],
-form input[type="time"] {
+form input[type="time"],
+form select ,
+form option{
     padding: 10px;
     margin-bottom: 10px;
     border: 1px solid #ccc;

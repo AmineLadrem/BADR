@@ -14,13 +14,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       
         $password = $_POST['password'];
 
-        $stmt2 = $conn->prepare("SELECT matricule FROM compte_utilisateur  WHERE mdp = ?");
-        $stmt2->bind_param("s", $password);
+        $stmt2 = $conn->prepare("SELECT * FROM compte_utilisateur  WHERE matricule=? and mdp = ?");
+        $stmt2->bind_param("is", $user['matricule'],$password);
         $stmt2->execute();
         $result2 = $stmt2->get_result();
 
         if ($result2->num_rows > 0) {
-        
+            $user2 = $result2->fetch_assoc();
             $_SESSION['email'] = $user['email'];
             $_SESSION['matricule'] = $user['matricule'];
             $_SESSION['nom'] = $user['nom'];
@@ -32,16 +32,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             setcookie("nom", $user['nom'], time() + (86400 * 30), "/"); 
             setcookie("matricule", $user['matricule'], time() + (86400 * 30), "/"); 
 
-            if ($user['est_superieur_hierarchique'] == 1) {
-                header("Location: menu_PDG.html");
-                exit;
-            } elseif ($user['is_supervisor'] == 1) {
-                header("Location: RH.html");
-                exit;
-            } else {
-                header("Location: menu_utilisateurs_nrml.html");
-                exit;
+            if($user2['mdp_reset']==0){
+                header("Location: pw_reset.php");
             }
+            else {
+                if ($user['est_superieur_hierarchique'] == 1) {
+                    header("Location: menu_PDG.html");
+                    exit;
+                } elseif ($user['is_supervisor'] == 1) {
+                    header("Location: RH.html");
+                    exit;
+                } else {
+                    header("Location: menu_utilisateurs_nrml.html");
+                    exit;
+                }
+
+            }
+
+            
         } else {
           
             $error = "Mot de passe incorrect.";

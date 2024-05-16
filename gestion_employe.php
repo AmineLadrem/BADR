@@ -177,7 +177,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $currentDate = date('Y-m-d H:i:s');
 
-    $sql = "INSERT INTO compte_utilisateur (mdp, matricule, date_creation) VALUES (?, ?, ?)";
+    $sql = "INSERT INTO compte_utilisateur (mdp,mdp_reset, matricule, date_creation) VALUES (?,0, ?, ?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("sss", $matricule, $matricule, $currentDate);
     $stmt->execute();
@@ -246,9 +246,17 @@ $result = $conn->query($sql);
                     </div>
 
                     <div class="flex-container">
-                        <label for="email">Statut:</label>
-                        <input type="text" id="statut" name="statut" required>
-                    </div>
+    <label for="statut">Statut:</label>
+    <select id="statut" name="statut" required>
+        <option value="Actif">Actif</option>
+        <option value="En Conge">En Congé</option>
+        <option value="En formation">En Formation</option>
+        <option value="Retraite">Retraite</option>
+        <option value="Suspendu">Suspendu</option>
+        <option value="Demissionaire">Démissionnaire</option>
+    </select>
+</div>
+
 
                     <div class="flex-container">
                         <label for="telephone">Téléphone:</label>
