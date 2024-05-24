@@ -11,7 +11,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 }
 
 
-$sql = "SELECT * FROM utilisateurs WHERE id = ?";
+$sql = "SELECT * FROM utilisateurs WHERE matricule = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id);
 $stmt->execute();
@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update'])) {
     $service = $_POST['service'];
     $poste = $_POST['poste'];
 
-    $sql = "UPDATE utilisateurs SET nom = ?, prenom = ?, date_naissance = ?, telephone = ?, email = ?, diplomes = ?, salaire = ?, statut = ?, service = ?, poste = ? WHERE id = ?";
+    $sql = "UPDATE utilisateurs SET nom = ?, prenom = ?, date_naissance = ?, telephone = ?, email = ?, diplomes = ?, salaire = ?, statut = ?, service = ?, poste = ? WHERE matricule = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ssssssssssi", $nom, $prenom, $date_naissance, $telephone, $email, $diplomes, $salaire, $statut, $service, $poste, $id);
     $stmt->execute();
