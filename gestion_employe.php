@@ -66,34 +66,47 @@ function insertUserData($conn, $nom, $prenom, $date_naissance, $telephone, $emai
         return $error;
     }
     
-    // Insert user data without matricule
-    $sql = "INSERT INTO utilisateurs (nom, prenom, date_naissance, telephone, email, joursCongesRestants, is_supervisor, salaire, statut, service, poste, est_superieur_hierarchique) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+   // Sanitize and escape variables to prevent SQL injection
+   $nom = $conn->real_escape_string($nom);
+   $prenom = $conn->real_escape_string($prenom);
+   $date_naissance = $conn->real_escape_string($date_naissance);
+   $telephone = $conn->real_escape_string($telephone);
+   $email = $conn->real_escape_string($email);
+   $joursCongesRestants = (int)$joursCongesRestants;
+   $is_supervisor = (int)$is_supervisor;
+   $salaire = $conn->real_escape_string($salaire);
+   $statut = $conn->real_escape_string($statut);
+   $service = $conn->real_escape_string($service);
+   $poste = $conn->real_escape_string($poste);
+   $est_superieur_hierarchique = $conn->real_escape_string($est_superieur_hierarchique);
+
+   // Insert user data without matricule
+   $sql = "INSERT INTO utilisateurs (nom, prenom, date_naissance, telephone, email, joursCongesRestants, is_supervisor, salaire, statut, service, poste, est_superieur_hierarchique) VALUES ('$nom', '$prenom', '$date_naissance', '$telephone', '$email', $joursCongesRestants, 0, '$salaire', '$statut', '$service', '$poste', 0)";
+   echo $sql;
+   if ($conn->query($sql) === TRUE) {
+       $userId = $conn->insert_id;
+
+       // Generate the matricule
+       $year = date("Y");
+       $matricule = $year . str_pad($userId, 3, "0", STR_PAD_LEFT);
+
+       // Update the user record with the matricule
+       $updateSql = "UPDATE utilisateurs SET matricule = '$matricule' WHERE id = $userId";
+       if ($conn->query($updateSql) === TRUE) {
+        $currentDate = date('Y-m-d H:i:s');
+
+    $sql = "INSERT INTO compte_utilisateur (mdp,mdp_reset, matricule, date_creation) VALUES (?,0, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssssiisssss", $nom, $prenom, $date_naissance, $telephone, $email, $joursCongesRestants, $is_supervisor, $salaire, $statut, $service, $poste, $est_superieur_hierarchique);
+    $stmt->bind_param("sss", $matricule, $matricule, $currentDate);
     $stmt->execute();
     
-    if ($stmt->error) {
-        return $stmt->error;
-    }
-
-    // Get the inserted user's ID
-    $userId = $stmt->insert_id;
-
-    // Generate the matricule
-    $year = date("Y");
-    $matricule = $year . str_pad($userId, 3, "0", STR_PAD_LEFT);
-
-    // Update the user record with the matricule
-    $updateSql = "UPDATE utilisateurs SET matricule = ? WHERE id = ?";
-    $updateStmt = $conn->prepare($updateSql);
-    $updateStmt->bind_param("si", $matricule, $userId);
-    $updateStmt->execute();
-
-    if ($updateStmt->error) {
-        return $updateStmt->error;
-    }
-
-    return "User added successfully with matricule: " . $matricule;
+           return "User added successfully with matricule: " . $matricule;
+       } else {
+           return "Error updating record: " . $conn->error;
+       }
+   } else {
+       return "Error: " . $sql . "<br>" . $conn->error;
+   }
 }
 
 function insertDiplomaData($conn, $email, $type_diplome, $domaine, $lieu_obtention, $date_obtention) {
@@ -109,6 +122,7 @@ function insertDiplomaData($conn, $email, $type_diplome, $domaine, $lieu_obtenti
     
 
     $sql = "INSERT INTO diplome (matricule, type_diplome, domaine, lieu_obtention, date_obtention) VALUES ((SELECT matricule FROM utilisateurs WHERE email = ? LIMIT 1), ?, ?, ?, ?)";
+    
     $stmt = $conn->prepare($sql);
 
 
@@ -184,7 +198,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    insertUserData($conn, $nom, $prenom, $date_naissance, $telephone, $email, $matricule, $joursCongesRestants, $is_supervisor, $salaire, $statut, $service, $poste, $est_superieur_hierarchique);
+    insertUserData($conn, $nom, $prenom, $date_naissance, $telephone, $email, $joursCongesRestants, $is_supervisor, $salaire, $statut, $service, $poste, $est_superieur_hierarchique);
 
 
 
@@ -199,14 +213,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
 
-    $currentDate = date('Y-m-d H:i:s');
-
-    $sql = "INSERT INTO compte_utilisateur (mdp,mdp_reset, matricule, date_creation) VALUES (?,0, ?, ?)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sss", $matricule, $matricule, $currentDate);
-    $stmt->execute();
     
-    header('Location: ' . $_SERVER['REQUEST_URI']);
+   // header('Location: ' . $_SERVER['REQUEST_URI']);
     exit;
   
 }
@@ -298,7 +306,7 @@ $result = $conn->query($sql);
                     </div>
 
                     <div class="flex-container">
-                        <label for="salaire">Service:</label>
+                        <label for="service">Service:</label>
                         <input type="text" id="service" name="service" required>
                     </div>
 
