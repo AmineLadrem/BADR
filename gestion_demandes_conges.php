@@ -131,24 +131,20 @@ elseif (isset($_POST['formType']) && $_POST['formType'] === 'form2') {
         $updateDays->execute();
         $updateDays->close();
 
-        if ($congeExceptionnel != 1) {
-            $insertConge = $conn->prepare("INSERT INTO conge (matricule, dateDebut, dateFin, justificatif, dec_rh, dec_pdg, statut) VALUES (?, ?, ?, ?, 2, 2, 'En Attente')");
-        } else {
+       
             $insertConge = $conn->prepare("INSERT INTO conge (matricule, dateDebut, dateFin, justificatif, dec_rh, dec_pdg, statut) VALUES (?, ?, ?, ?, 1, 1, 'Accepté')");
-        }
-
         $insertConge->bind_param("isss", $matricule_user, $dateDebut, $dateFin, $justificatif);
 
         if ($insertConge->execute()) {
            
-            if ($congeExceptionnel == 1) {
+           
                 $excep = $remarque;
                 
                 $insertCongeExcep = $conn->prepare("INSERT INTO conge_excep (matricule, excep, id_cong) VALUES (?, ?, LAST_INSERT_ID())");
                 $insertCongeExcep->bind_param("is", $matricule_user, $excep);
                 $insertCongeExcep->execute();
                 $insertCongeExcep->close();
-            }
+            
 
             header('Location: ' . $_SERVER['REQUEST_URI']);
             exit;
@@ -273,12 +269,9 @@ END");
     <br>
 
     <br>
-
-    <label for="congeExceptionnel">Congé exceptionnel ?</label>
-    <input type="checkbox" id="congeExceptionnel" name="congeExceptionnel" value=1>
  
     
-    <div id="congeExceptionnelInputs" style="display: none;">
+    <div id="congeExceptionnelInputs">
         <label for="pieceJointe">Pièce jointe</label>
         <input type="file" id="actual-btn" hidden/>
 

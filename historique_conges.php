@@ -288,7 +288,9 @@ button[value="refuser"]:hover {
 
 $sql = "SELECT u.matricule, u.nom, u.prenom, dc.dateDebut, dc.dateFin, dc.justificatif, dc.statut, u.email, dc.dec_rh, dc.dec_pdg, dc.id
 FROM conge dc
-INNER JOIN utilisateurs u ON dc.matricule = u.matricule";
+INNER JOIN utilisateurs u ON dc.matricule = u.matricule
+LEFT JOIN conge_excep ce ON dc.id = ce.id_cong
+WHERE ce.id_cong IS NULL";
 
 if (!empty($filter_matricule)) {
 $sql .= " WHERE u.matricule LIKE '%$filter_matricule%'";

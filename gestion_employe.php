@@ -8,6 +8,7 @@ $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "gestion_utilisateurs";
+$matricule='';
 
 $dateToday = date("Y-m-d");
 
@@ -50,7 +51,7 @@ function generateMatricule($date_debut, $date_naissance, $telephone) {
     return $matricule;
 }
 
-function insertUserData($conn, $nom, $prenom, $date_naissance, $telephone, $email, $matricule, $joursCongesRestants, $is_supervisor, $salaire, $statut, $service, $poste, $est_superieur_hierarchique) {
+function insertUserData($conn, $nom, $prenom, $date_naissance, $telephone, $email, $joursCongesRestants, $is_supervisor, $salaire, $statut, $service, $poste, $est_superieur_hierarchique) {
     $emailExist = emailExists($conn, $email);
     $phoneExist = phoneExists($conn, $telephone);
 
@@ -65,11 +66,34 @@ function insertUserData($conn, $nom, $prenom, $date_naissance, $telephone, $emai
         return $error;
     }
     
-    $sql = "INSERT INTO utilisateurs (nom, prenom, date_naissance, telephone, email, matricule, joursCongesRestants, is_supervisor, salaire, statut, service, poste, est_superieur_hierarchique) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    // Insert user data without matricule
+    $sql = "INSERT INTO utilisateurs (nom, prenom, date_naissance, telephone, email, joursCongesRestants, is_supervisor, salaire, statut, service, poste, est_superieur_hierarchique) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssssssiiissss", $nom, $prenom, $date_naissance, $telephone, $email, $matricule, $joursCongesRestants, $is_supervisor, $salaire, $statut, $service, $poste, $est_superieur_hierarchique);
+    $stmt->bind_param("sssssiisssss", $nom, $prenom, $date_naissance, $telephone, $email, $joursCongesRestants, $is_supervisor, $salaire, $statut, $service, $poste, $est_superieur_hierarchique);
     $stmt->execute();
-    return $stmt->error;
+    
+    if ($stmt->error) {
+        return $stmt->error;
+    }
+
+    // Get the inserted user's ID
+    $userId = $stmt->insert_id;
+
+    // Generate the matricule
+    $year = date("Y");
+    $matricule = $year . str_pad($userId, 3, "0", STR_PAD_LEFT);
+
+    // Update the user record with the matricule
+    $updateSql = "UPDATE utilisateurs SET matricule = ? WHERE id = ?";
+    $updateStmt = $conn->prepare($updateSql);
+    $updateStmt->bind_param("si", $matricule, $userId);
+    $updateStmt->execute();
+
+    if ($updateStmt->error) {
+        return $updateStmt->error;
+    }
+
+    return "User added successfully with matricule: " . $matricule;
 }
 
 function insertDiplomaData($conn, $email, $type_diplome, $domaine, $lieu_obtention, $date_obtention) {
@@ -137,7 +161,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $date_naissance = $_POST['date_naissance'];
     $telephone = $_POST['telephone'];
     $email = $_POST['email'];
-    $matricule = generateMatricule($dateToday, $date_naissance, $telephone);
+    
     $joursCongesRestants = 30;
     $is_supervisor = 0;
     $salaire = $_POST['salaire'];
@@ -414,9 +438,10 @@ $result = $conn->query($sql);
                     <th>Salaire</th>
                     <th>Statut</th>
                     <th>Service</th>
-                    <th>Poste</th>
                     <th>Diplome</th>
                     <th>Experience</th>
+                    <th>Poste</th>
+                    
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -445,8 +470,8 @@ $result = $conn->query($sql);
                         <td><?= $row["salaire"] ?></td>
                         <td><?= $row["statut"] ?></td>
                         <td><?= $row["service"] ?></td>
-                        <td><a><i class="fas fa-plus add" style="color: #148d04;     padding-left: 14px;"></i></a></td>
-                        <td><a><i class="fas fa-plus add" style="color: #148d04;     padding-left: 14px;"></i></a></td>
+                        <td> <a class="toggle-diploma"><i class="fas fa-plus add" style="color: #148d04; padding-left: 14px;"></i></a></td>
+                        <td><a class="toggle-experience"><i class="fas fa-plus add" style="color: #148d04; padding-left: 14px;"></i></a></td>
                         <td><?= $row["poste"] ?></td>
                         <td>
                         <a class="update-user" href="update_user.php?id=<?= $row['matricule'] ?>"><i class="fas fa-edit" style="color: orange;"></i></a>
@@ -455,6 +480,70 @@ $result = $conn->query($sql);
 
 
                     </tr>
+                    <tr class="diploma-row" style="display: none;">
+    <td colspan="12">
+        
+            <table>
+                <thead>
+                    <tr>
+                        <th>Type de diplôme</th>
+                        <th>Domaine</th>
+                        <th>Lieu d'obtention</th>
+                        <th>Date d'obtention</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $diplomeSql = "SELECT type_diplome, domaine, lieu_obtention, date_obtention FROM diplome WHERE matricule = '{$row["matricule"]}'";
+                    $diplomeResult = $conn->query($diplomeSql);
+                    while ($diplomeRow = $diplomeResult->fetch_assoc()) :
+                    ?>
+                        <tr>
+                            <td><?= $diplomeRow["type_diplome"] ?></td>
+                            <td><?= $diplomeRow["domaine"] ?></td>
+                            <td><?= $diplomeRow["lieu_obtention"] ?></td>
+                            <td><?= $diplomeRow["date_obtention"] ?></td>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+       
+    </td>
+</tr>
+ 
+<tr class="experience-row" style="display: none;">
+    <td colspan="12">
+         
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date de début</th>
+                        <th>Date de fin</th>
+                        <th>Poste</th>
+                        <th>Entreprise</th>
+                        <th>Motif</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $experienceSql = "SELECT date_debut, date_fin, poste, entreprise, motif FROM experience WHERE matricule = '{$row["matricule"]}'";
+                    $experienceResult = $conn->query($experienceSql);
+                    while ($experienceRow = $experienceResult->fetch_assoc()) :
+                    ?>
+                        <tr>
+                            <td><?= $experienceRow["date_debut"] ?></td>
+                            <td><?= $experienceRow["date_fin"] ?></td>
+                            <td><?= $experienceRow["poste"] ?></td>
+                            <td><?= $experienceRow["entreprise"] ?></td>
+                            <td><?= $experienceRow["motif"] ?></td>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+       
+    </td>
+</tr>
+                    
                 <?php endwhile; ?>
 
             </tbody>
@@ -467,6 +556,49 @@ $result = $conn->query($sql);
     <script src="get_name.js"></script>
 
     <script>
+
+document.addEventListener('DOMContentLoaded', function () {
+    const toggleDiplomaButtons = document.querySelectorAll('.toggle-diploma');
+    toggleDiplomaButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const row = this.closest('tr').nextElementSibling;
+            toggleRowVisibility(row);
+            toggleIcon(this);
+        });
+    });
+
+    const toggleExperienceButtons = document.querySelectorAll('.toggle-experience');
+    toggleExperienceButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const row = this.closest('tr').nextElementSibling.nextElementSibling;
+            toggleRowVisibility(row);
+            toggleIcon(this);
+        });
+    });
+});
+
+function toggleRowVisibility(row) {
+    if (row.style.display === 'none') {
+        row.style.display = 'table-row';
+    } else {
+        row.style.display = 'none';
+    }
+}
+
+
+function toggleIcon(icon) {
+    if (icon.querySelector('i').classList.contains('fa-plus')) {
+        icon.querySelector('i').classList.remove('fa-plus');
+        icon.querySelector('i').classList.add('fa-minus');
+        icon.style.color = '#FF5733';  
+    } else {
+        icon.querySelector('i').classList.remove('fa-minus');
+        icon.querySelector('i').classList.add('fa-plus');
+        icon.style.color = '#148d04';  
+    }
+}
+
+
 
 function editUser(matricule) {
    
