@@ -82,7 +82,7 @@ function insertUserData($conn, $nom, $prenom, $date_naissance, $telephone, $emai
 
    // Insert user data without matricule
    $sql = "INSERT INTO utilisateurs (nom, prenom, date_naissance, telephone, email, joursCongesRestants, is_supervisor, salaire, statut, service, poste, est_superieur_hierarchique) VALUES ('$nom', '$prenom', '$date_naissance', '$telephone', '$email', $joursCongesRestants, 0, '$salaire', '$statut', '$service', '$poste', 0)";
-   echo $sql;
+   
    if ($conn->query($sql) === TRUE) {
        $userId = $conn->insert_id;
 
